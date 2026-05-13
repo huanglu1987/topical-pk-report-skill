@@ -125,6 +125,17 @@ product:
 
 study_design:
   dosing_scenario: "single"
+  dosing_frequency: "daily_qd"
+  dosing_frequency_scenarios:
+    - name: "daily_qd"
+      label: "每日一次"
+      dosing_interval_h: 24
+    - name: "weekly_qw"
+      label: "每周一次"
+      dosing_interval_h: 168
+    - name: "weekly_biw"
+      label: "每周两次"
+      dosing_interval_h: 84
   purpose: "exploratory"
   sampling_purposes:
     - "exploratory"

@@ -107,6 +107,7 @@ def _metric_table(summary: dict[str, Any]) -> list[str]:
         "cmax_ratio_reference": "Cmax_topical / Cmax_reference",
         "time_to_90pct_steady_state_h": "达到90%稳态时间 (h)",
         "time_to_95pct_steady_state_h": "达到95%稳态时间 (h)",
+        "time_to_99pct_steady_state_h": "达到接近100%(99%)稳态时间 (h)",
     }
     if is_multiple:
         order = [
@@ -121,6 +122,7 @@ def _metric_table(summary: dict[str, Any]) -> list[str]:
             "rac",
             "time_to_90pct_steady_state_h",
             "time_to_95pct_steady_state_h",
+            "time_to_99pct_steady_state_h",
             "auc_ratio_reference",
             "cmax_ratio_reference",
         ]
@@ -149,10 +151,30 @@ def _steady_state_lines(summary: dict[str, Any]) -> list[str]:
         return ["- 未记录稳态时间评估。"]
     return [
         f"- t1/2_eff：{_fmt(ss.get('t_half_eff_h'))} h",
+        f"- 50% 稳态时间：{_fmt(ss.get('t_ss_50_h'))} h",
+        f"- 75% 稳态时间：{_fmt(ss.get('t_ss_75_h'))} h",
         f"- 90% 稳态时间：{_fmt(ss.get('t_ss_90_h'))} h",
         f"- 95% 稳态时间：{_fmt(ss.get('t_ss_95_h'))} h",
+        f"- 接近 100% 稳态时间（按 99% 计）：{_fmt(ss.get('t_ss_99_h'))} h",
         f"- 计算口径：{ss.get('method', '')}",
     ]
+
+
+def _frequency_ss_lines(summary: dict[str, Any]) -> list[str]:
+    rows = summary.get("systemic_pk", {}).get("steady_state_assessment", {}).get("by_frequency", [])
+    if not rows:
+        return ["- 未生成给药频率-稳态时间矩阵。"]
+    lines = [
+        "| 给药频率 | 给药间隔(h) | 稳态比例 | 理论时间(h) | 理论时间(day) | 首个不早于该时间的给药次序 | 对应给药时间(day) |",
+        "|---|---:|---|---:|---:|---:|---:|",
+    ]
+    for row in rows:
+        lines.append(
+            f"| {_cell(row.get('frequency_label'))} | {_fmt(row.get('dosing_interval_h'), 1)} | {_cell(row.get('target_label'))} | {_fmt(row.get('theoretical_time_h'), 1)} | {_fmt(row.get('theoretical_time_day'), 2)} | {_cell(row.get('first_dose_number_at_or_after'))} | {_fmt(row.get('first_dose_time_day'), 2)} |"
+        )
+    lines.append("")
+    lines.append("- 注：100% 稳态为理论渐近值，表中“接近100%”按 99% 稳态计算。")
+    return lines
 
 
 def _risk_lines(summary: dict[str, Any]) -> list[str]:
@@ -382,6 +404,10 @@ def generate_report(
             "",
             *_steady_state_lines(summary),
             "",
+            "## 3.6 不同给药频率下的稳态时间",
+            "",
+            *_frequency_ss_lines(summary),
+            "",
             "## 4. 早期快速吸收判定",
             "",
             *_fast_absorption_lines(summary),
@@ -472,6 +498,9 @@ def generate_report(
             gate_df.to_excel(writer, index=False, sheet_name="decision_gate")
             pd.DataFrame([summary.get("risk_summary", {})]).to_excel(writer, index=False, sheet_name="risk_summary")
             pd.DataFrame(summary.get("metric_quantiles", {})).T.to_excel(writer, sheet_name="metric_quantiles")
+            ss_rows = summary.get("systemic_pk", {}).get("steady_state_assessment", {}).get("by_frequency", [])
+            if ss_rows:
+                pd.DataFrame(ss_rows).to_excel(writer, index=False, sheet_name="ss_by_frequency")
             if provenance.empty is False:
                 provenance.to_excel(writer, index=False, sheet_name="parameter_provenance")
             if sensitivity.empty is False:

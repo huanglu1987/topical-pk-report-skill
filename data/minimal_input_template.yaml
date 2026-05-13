@@ -1,5 +1,6 @@
 # Minimal runnable input for teammate onboarding.
 # Required: molecule, concentration, dosage form, dosing amount, and dosing scenario.
+# If dosing_scenario is "multiple", dosing_frequency is also required.
 # If dose_mg_per_application is blank, the tool calculates:
 # concentration_percent_w_w x 10 x daily_amount_g / applications_per_day.
 # Without verified same-molecule PK anchors, the tool may use generic fallback
@@ -19,6 +20,20 @@ product:
 study_design:
   # Use "single" for single dose or "multiple" for repeated dosing.
   dosing_scenario: "single"
+  # Required when dosing_scenario is "multiple": daily_qd, weekly_qw, weekly_biw,
+  # or set product.dosing_interval_h directly in hours.
+  dosing_frequency: "daily_qd"
+  # Used for steady-state planning when dosing_scenario is multiple.
+  dosing_frequency_scenarios:
+    - name: "daily_qd"
+      label: "每日一次"
+      dosing_interval_h: 24
+    - name: "weekly_qw"
+      label: "每周一次"
+      dosing_interval_h: 168
+    - name: "weekly_biw"
+      label: "每周两次"
+      dosing_interval_h: 84
   purpose: "exploratory"
   sampling_purposes: ["exploratory"]
   n_simulations: 1000

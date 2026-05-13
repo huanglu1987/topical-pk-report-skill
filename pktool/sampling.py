@@ -103,6 +103,27 @@ def _nearest_concentration(time: np.ndarray, values: np.ndarray, candidate: floa
     return float(np.interp(candidate, time, values))
 
 
+def _adaptive_terminal_times(summary: dict[str, Any]) -> list[tuple[float, str, str]]:
+    ss = summary.get("systemic_pk", {}).get("steady_state_assessment", {})
+    t_half_eff = ss.get("t_half_eff_h")
+    try:
+        t_half_eff = float(t_half_eff)
+    except (TypeError, ValueError):
+        return []
+    if t_half_eff <= 0:
+        return []
+    dose_times = summary.get("dosing_times_h") or [0.0]
+    try:
+        last_dose_h = float(dose_times[-1])
+    except (TypeError, ValueError, IndexError):
+        last_dose_h = 0.0
+    rows = []
+    for multiple in (2, 3):
+        candidate = last_dose_h + multiple * t_half_eff
+        rows.append((candidate, f"末端相确认（末次给药后 {multiple} x t1/2_eff）", "自适应末端随访"))
+    return rows
+
+
 def recommend_sampling(
     simulation_path: str | Path = "outputs/simulation_results.csv",
     design_path: str | Path = "data/study_design.yaml",
@@ -123,7 +144,13 @@ def recommend_sampling(
 
     rows: list[dict[str, Any]] = []
     for purpose in _sampling_purposes(design):
-        for candidate_time, sample_intent, stage in PURPOSE_SCHEDULES[purpose]:
+        schedule = [*PURPOSE_SCHEDULES[purpose], *_adaptive_terminal_times(summary)]
+        seen_times: set[float] = set()
+        for candidate_time, sample_intent, stage in schedule:
+            rounded_time = round(float(candidate_time), 3)
+            if rounded_time in seen_times:
+                continue
+            seen_times.add(rounded_time)
             conc_p50 = _nearest_concentration(time, p50, candidate_time)
             conc_p95 = _nearest_concentration(time, p95, candidate_time)
             within_simulation = 0 <= candidate_time <= duration

@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 from .io_utils import get_range, load_compound_profile, load_reference_pk, read_yaml, to_float, write_json
-from .pk import effective_steady_state_times, interval_auc, resolve_systemic_pk, trapezoid_auc
+from .pk import effective_steady_state_times, interval_auc, resolve_systemic_pk, steady_state_frequency_matrix, trapezoid_auc
 
 
 VARIABILITY_PRESETS: dict[str, tuple[float, float]] = {
@@ -103,6 +103,30 @@ def _extract_range(value: Any) -> tuple[float, float] | None:
     if low > high:
         low, high = high, low
     return float(low), float(high)
+
+
+def _frequency_scenarios(design: dict[str, Any], product: dict[str, Any]) -> list[dict[str, Any]]:
+    explicit = design.get("dosing_frequency_scenarios") or design.get("frequency_scenarios") or product.get("dosing_frequency_scenarios")
+    if isinstance(explicit, list) and explicit:
+        scenarios = []
+        for item in explicit:
+            if isinstance(item, dict):
+                tau = to_float(item.get("dosing_interval_h") or item.get("tau_h"))
+                if tau and tau > 0:
+                    scenarios.append(
+                        {
+                            "name": str(item.get("name") or f"q{tau:g}h"),
+                            "label": str(item.get("label") or item.get("name") or f"q{tau:g}h"),
+                            "dosing_interval_h": float(tau),
+                        }
+                    )
+        if scenarios:
+            return scenarios
+    return [
+        {"name": "daily_qd", "label": "每日一次", "dosing_interval_h": 24.0},
+        {"name": "weekly_qw", "label": "每周一次", "dosing_interval_h": 168.0},
+        {"name": "weekly_biw", "label": "每周两次", "dosing_interval_h": 84.0},
+    ]
 
 
 def _fast_absorption_auto_assessment(compound: dict[str, Any], product: dict[str, Any]) -> dict[str, Any]:
@@ -829,6 +853,10 @@ def run_exposure_simulation(
         depot_half_life_h=depot_half_life_range[1],
         fast_absorption_half_life_h=(math.log(2) / ka_fast_range[0] if fast_absorption_enabled and ka_fast_range[0] > 0 else None),
     )
+    steady_state_by_frequency = steady_state_frequency_matrix(
+        steady_state["t_half_eff_h"],
+        _frequency_scenarios(design, product),
+    )
     fast_ss = effective_steady_state_times(math.log(2) / ka_fast_range[0]) if ka_fast_range[0] > 0 else {}
     depot_ss = effective_steady_state_times(depot_half_life_range[1]) if depot_half_life_range[1] > 0 else {}
 
@@ -878,6 +906,7 @@ def run_exposure_simulation(
                 "terminal_concentration_ng_ml": clast,
                 "time_to_90pct_steady_state_h": steady_state["t_ss_90_h"],
                 "time_to_95pct_steady_state_h": steady_state["t_ss_95_h"],
+                "time_to_99pct_steady_state_h": steady_state["t_ss_99_h"],
                 "predose_gt_lloq": predose_positive,
                 "auc_ratio_reference": auc0t / pk.reference_auc_ng_h_ml if pk.reference_auc_ng_h_ml else np.nan,
                 "cmax_ratio_reference": cmax_global / pk.reference_cmax_ng_ml if pk.reference_cmax_ng_ml else np.nan,
@@ -906,6 +935,7 @@ def run_exposure_simulation(
         "fast_absorption_fraction",
         "time_to_90pct_steady_state_h",
         "time_to_95pct_steady_state_h",
+        "time_to_99pct_steady_state_h",
         "auc_tau_ss_ng_h_ml",
         "auc_0_t_studyend_ng_h_ml",
         "auc_post_last_dose_to_inf_ng_h_ml",
@@ -984,6 +1014,8 @@ def run_exposure_simulation(
             "formulation": str(product.get("formulation", "")),
             "concentration_percent_w_w": product.get("concentration_percent_w_w"),
             "daily_amount_g": product.get("daily_amount_g"),
+            "dosing_scenario": str(product.get("dosing_scenario", "")),
+            "dosing_frequency": str(product.get("dosing_frequency", "")),
             "treated_area_cm2": product.get("treated_area_cm2"),
             "skin_condition": str(product.get("skin_condition", "")),
             "max_use_condition": str(product.get("max_use_condition", "")),
@@ -1012,6 +1044,7 @@ def run_exposure_simulation(
                 "method": "t_half_eff = max(elimination half-life, slowest fast absorption half-life, depot release half-life)",
                 "fast_channel": fast_ss,
                 "depot_channel": depot_ss,
+                "by_frequency": steady_state_by_frequency,
             },
             "warnings": list(pk.warnings),
         },

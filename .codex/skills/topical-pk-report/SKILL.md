@@ -56,13 +56,14 @@ If `pktool` is not installed or cannot be located, stop and report the installat
 
 ## Minimum Runnable Input
 
-For teammate-facing use, the skill can start from five pieces of product information:
+For teammate-facing use, the skill can start from five baseline pieces of product information. Multiple-dose use has one additional required field for dosing frequency.
 
 - specific molecule: `compound.compound_name`
 - specific dosage form: `product.formulation`
 - concentration: `product.concentration_percent_w_w`
 - dosing amount: either `product.daily_amount_g` or `product.dose_mg_per_application`
 - dosing scenario: `study_design.dosing_scenario`, either `single` or `multiple`
+- multiple-dose frequency, required only when `dosing_scenario: multiple`: `study_design.dosing_frequency` (`daily_qd`, `weekly_qw`, `weekly_biw`) or `product.dosing_interval_h` in hours
 
 Use `templates/minimal_input_template.yaml` when the user only has these basics. If `dose_mg_per_application` is missing, the tool derives it as:
 
@@ -72,13 +73,21 @@ dose_mg_per_application = concentration_percent_w_w x 10 x daily_amount_g / appl
 
 Generic fallback assumptions are applied only when same-molecule PK anchors are absent: half-life 12 h, V 50 L, medium variability, exploratory purpose, and conservative topical absorption ranges. These fallback values are not historical data for the molecule and must not be cited as evidence. The report must clearly mark them as default/model-derived assumptions and treat the output as exploratory only.
 
-If the product is not once daily or single-application, also ask for `applications_per_day` and `treatment_duration_h`.
+If the product is multiple-dose, do not proceed until the frequency is explicit. If the product is not once daily or single-application, also ask for `applications_per_day`, `product.dosing_interval_h`, and `treatment_duration_h` as applicable.
 
 Default duration logic:
 
-- `single`: defaults to one application over 24 h and a 168 h simulation window.
-- `multiple`: defaults to once-daily dosing for 28 days and a 7-day post-last-dose follow-up window.
+- `single`: defaults to one application over 24 h. The simulation window is at least 168 h and is extended to at least 3 x `t_half_eff` for long half-life or slow depot products, so terminal elimination has at least two late follow-up points.
+- `multiple`: requires `study_design.dosing_frequency` or `product.dosing_interval_h`; when only the frequency is provided, defaults to 28 days and a 7-day post-last-dose follow-up window.
 - Explicit `product.treatment_duration_h`, `study_design.dosing_duration_h`, or `study_design.duration_h` overrides these defaults.
+
+For multiple-dose planning, always include a steady-state frequency matrix for:
+
+- `daily_qd`: once daily, dosing interval 24 h
+- `weekly_qw`: once weekly, dosing interval 168 h
+- `weekly_biw`: twice weekly, dosing interval 84 h
+
+The matrix must report 50%, 75%, 90%, 95%, and near-100% steady state. Near-100% means 99%, because true 100% is a theoretical asymptote.
 
 ## Recommended Enhanced Input
 
@@ -147,6 +156,8 @@ Default outputs include:
 - `outputs/simulation_results.csv`
 
 The main structured V1.1 output block is `simulation_summary.json.decision_gate`.
+
+For long half-life products, `sampling_recommendation.csv` should include adaptive terminal points at 2 x and 3 x `t_half_eff` after the last dose when they are inside or relevant to the simulation window.
 
 ## V1.1 Interpretation Rules
 

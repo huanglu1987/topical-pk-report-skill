@@ -197,6 +197,104 @@ def _dosing_scenario(study: dict[str, Any], product: dict[str, Any]) -> str:
     return ""
 
 
+FREQUENCY_PRESETS_H = {
+    "daily_qd": 24.0,
+    "qd": 24.0,
+    "daily": 24.0,
+    "once_daily": 24.0,
+    "once-daily": 24.0,
+    "每日一次": 24.0,
+    "每天一次": 24.0,
+    "一日一次": 24.0,
+    "weekly_qw": 168.0,
+    "qw": 168.0,
+    "weekly": 168.0,
+    "once_weekly": 168.0,
+    "once-weekly": 168.0,
+    "每周一次": 168.0,
+    "weekly_biw": 84.0,
+    "biw": 84.0,
+    "twice_weekly": 84.0,
+    "twice-weekly": 84.0,
+    "每周两次": 84.0,
+    "每周二次": 84.0,
+}
+
+
+def _dosing_frequency(study: dict[str, Any], product: dict[str, Any]) -> str:
+    raw = str(
+        study.get("dosing_frequency")
+        or product.get("dosing_frequency")
+        or study.get("frequency")
+        or product.get("frequency")
+        or ""
+    ).strip()
+    return raw
+
+
+def _normalized_frequency_key(raw: str) -> str:
+    return raw.strip().lower().replace(" ", "_")
+
+
+def _dosing_interval_h(
+    study: dict[str, Any],
+    product: dict[str, Any],
+    dosing_scenario: str,
+    applications_per_day: int,
+) -> tuple[float, str]:
+    explicit_interval = to_float(product.get("dosing_interval_h"))
+    if explicit_interval is None:
+        explicit_interval = to_float(study.get("dosing_interval_h"))
+    if explicit_interval is not None and explicit_interval > 0:
+        return float(explicit_interval), "custom_interval_h"
+
+    raw_frequency = _dosing_frequency(study, product)
+    if raw_frequency:
+        key = _normalized_frequency_key(raw_frequency)
+        if key in FREQUENCY_PRESETS_H:
+            return FREQUENCY_PRESETS_H[key], key
+        parsed = to_float(raw_frequency)
+        if parsed is not None and parsed > 0:
+            return float(parsed), "custom_interval_h"
+        raise ValueError(
+            "无法识别 study_design.dosing_frequency。可填写 daily_qd、weekly_qw、weekly_biw，"
+            "或直接填写 dosing_interval_h（小时）。"
+        )
+
+    if dosing_scenario == "multiple":
+        raise ValueError(
+            "多次给药最小输入必须填写 study_design.dosing_frequency（如 daily_qd、weekly_qw、weekly_biw），"
+            "或填写 product.dosing_interval_h。"
+        )
+
+    tau = float(24 / applications_per_day)
+    if applications_per_day == 1:
+        return tau, "daily_qd"
+    return tau, f"q{tau:g}h"
+
+
+def _range_high(value: Any, default: float) -> float:
+    normalized = _normalize_optional_range(value)
+    if normalized:
+        return float(normalized[1])
+    return default
+
+
+def _anchor_half_life_h(compound: dict[str, Any], reference: dict[str, Any], selected_reference: dict[str, Any]) -> float:
+    return float(to_float(_fallback_value(compound.get("half_life_h"), reference.get("half_life_h"), selected_reference.get("half_life_h")), 12.0) or 12.0)
+
+
+def _default_frequency_scenarios(study: dict[str, Any]) -> list[dict[str, Any]]:
+    explicit = study.get("dosing_frequency_scenarios") or study.get("frequency_scenarios")
+    if isinstance(explicit, list) and explicit:
+        return explicit
+    return [
+        {"name": "daily_qd", "label": "每日一次", "dosing_interval_h": 24},
+        {"name": "weekly_qw", "label": "每周一次", "dosing_interval_h": 168},
+        {"name": "weekly_biw", "label": "每周两次", "dosing_interval_h": 84},
+    ]
+
+
 def write_input_files(
     input_data: dict[str, Any],
     run_dir: str | Path,
@@ -301,12 +399,23 @@ def write_input_files(
         ["parameter", "value", "unit", "source", "used_for_model"],
     )
 
+    dosing_scenario = _dosing_scenario(study, product)
     dose_mg = _dose_mg_per_application(product)
     applications_per_day = int(to_float(product.get("applications_per_day"), 1) or 1)
-    dosing_interval_h = float(product.get("dosing_interval_h") or 24 / applications_per_day)
-    dosing_scenario = _dosing_scenario(study, product)
+    dosing_interval_h, dosing_frequency_resolved = _dosing_interval_h(
+        study,
+        product,
+        dosing_scenario,
+        applications_per_day,
+    )
+    dosing_frequency = _dosing_frequency(study, product) or dosing_frequency_resolved
     explicit_treatment_duration_h = to_float(product.get("treatment_duration_h")) or to_float(study.get("dosing_duration_h"))
     explicit_simulation_duration_h = to_float(study.get("duration_h")) or to_float(product.get("simulation_duration_h"))
+    t_half_eff_default_h = max(
+        _anchor_half_life_h(compound, reference, selected_reference),
+        _range_high(product.get("depot_half_life_h_range"), 96.0),
+    )
+    single_default_duration_h = max(168.0, 3.0 * t_half_eff_default_h)
     if explicit_treatment_duration_h is not None:
         treatment_duration_h = float(explicit_treatment_duration_h)
     elif dosing_scenario == "single":
@@ -321,7 +430,7 @@ def write_input_files(
     if explicit_simulation_duration_h is not None:
         simulation_duration_h = float(explicit_simulation_duration_h)
     elif dosing_scenario == "single":
-        simulation_duration_h = 168.0
+        simulation_duration_h = single_default_duration_h
     elif dosing_scenario == "multiple":
         simulation_duration_h = treatment_duration_h + 168.0
     else:
@@ -338,6 +447,7 @@ def write_input_files(
             "dose_mg_per_application": dose_mg,
             "applications_per_day": applications_per_day,
             "dosing_interval_h": dosing_interval_h,
+            "dosing_frequency": dosing_frequency,
             "dosing_scenario": dosing_scenario or "",
             "treatment_duration_h": treatment_duration_h,
             "treated_area_cm2": product.get("treated_area_cm2", ""),
@@ -376,6 +486,8 @@ def write_input_files(
                 "duration_h": simulation_duration_h,
             },
             "dosing_scenario": dosing_scenario or "",
+            "dosing_frequency": dosing_frequency,
+            "dosing_frequency_scenarios": _default_frequency_scenarios(study),
             "purpose": purpose_override or study.get("purpose", "exploratory"),
             "sampling_purposes": study.get("sampling_purposes", [purpose_override] if purpose_override else ["exploratory", "must_max_use", "be_bridging"]),
             "candidate_sampling_hours": study.get("candidate_sampling_hours", DEFAULT_CANDIDATE_SAMPLING_HOURS),

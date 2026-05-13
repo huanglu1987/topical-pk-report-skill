@@ -88,7 +88,7 @@ python -m pip install -e .
 
 ### 同事最小输入模式
 
-如果同事只是想先跑一个探索性预测，最低只需要填写 5 类信息：
+如果同事只是想先跑一个探索性预测，最低只需要填写 5 类基础信息；如果是多次给药，还必须填写给药频率：
 
 | 必填信息 | YAML 字段 | 示例 |
 |---|---|---|
@@ -97,6 +97,7 @@ python -m pip install -e .
 | 浓度 | `product.concentration_percent_w_w` | `3.0` |
 | 给药剂量 | `product.daily_amount_g` 或 `product.dose_mg_per_application` | `4.0 g` 或 `120 mg` |
 | 单次或多次 | `study_design.dosing_scenario` | `single` 或 `multiple` |
+| 多次给药频率（多次时必填） | `study_design.dosing_frequency` 或 `product.dosing_interval_h` | `daily_qd`、`weekly_qw`、`weekly_biw` 或 `168` |
 
 最小模板位置：
 
@@ -117,9 +118,19 @@ python3 -m pktool.cli run-report \
 
 `dosing_scenario` 的默认规则：
 
-- `single`：默认单次给药，给药持续 24 h，模拟到 168 h。
-- `multiple`：默认每日给药 28 天，并额外模拟末次给药后 7 天。
+- `single`：默认单次给药，给药持续 24 h；模拟窗口至少 168 h。若半衰期或 depot 释放较长，会自动延长到至少 3 x `t_half_eff`，并在采血点中加入至少 2 个末端相确认点。
+- `multiple`：必须填写 `study_design.dosing_frequency` 或 `product.dosing_interval_h`；如只填 `dosing_frequency`，默认给药 28 天，并额外模拟末次给药后 7 天。
 - 如已知真实周期，可用 `product.treatment_duration_h`、`study_design.dosing_duration_h` 或 `study_design.duration_h` 覆盖默认值。
+
+`study_design.dosing_frequency` 可直接控制实际模拟给药间隔；多次给药频率规划还会默认额外输出三种稳态情景：
+
+| 场景 | 字段值 | 给药间隔 |
+|---|---|---:|
+| 每日一次 | `daily_qd` | 24 h |
+| 每周一次 | `weekly_qw` | 168 h |
+| 每周两次 | `weekly_biw` | 84 h |
+
+报告会列出每种频率达到 50%、75%、90%、95%、接近 100% 稳态的时间；其中“接近 100%”按 99% 稳态计算，因为真实 100% 是理论渐近值。
 
 最小模式在缺少同分子 PK 锚点时，会启用通用兜底假设，例如 `t1/2 = 12 h`、`V = 50 L`、`medium variability` 和保守外用吸收范围。这里的兜底值不是该分子的历史数据，也不是可引用证据；报告会把这些参数标记为 `default` 或 `model_default_or_derived`。它适合内部快速判断和采血点初筛，不适合直接用于 CRO SOW、正式 MUsT/max-use 方案或监管材料。
 

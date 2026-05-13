@@ -122,14 +122,40 @@ class TestSimulation(unittest.TestCase):
             self.assertEqual(product["treatment_duration_h"], 24.0)
 
             input_path = root / "multiple.yaml"
-            base["study_design"] = {"dosing_scenario": "multiple", "n_simulations": 10}
+            base["study_design"] = {"dosing_scenario": "multiple", "dosing_frequency": "weekly_qw", "n_simulations": 10}
             input_path.write_text(yaml.safe_dump(base, allow_unicode=True), encoding="utf-8")
             result = run_from_basic_input(input_path, output_root=root / "runs2", fetch_evidence=False)
             product = yaml.safe_load(Path(result["input_files"]["product"]).read_text(encoding="utf-8"))
             design = yaml.safe_load(Path(result["input_files"]["design"]).read_text(encoding="utf-8"))
             self.assertEqual(product["dosing_scenario"], "multiple")
+            self.assertEqual(product["dosing_frequency"], "weekly_qw")
+            self.assertEqual(product["dosing_interval_h"], 168.0)
+            self.assertEqual(design["dosing_frequency"], "weekly_qw")
             self.assertEqual(product["treatment_duration_h"], 672.0)
             self.assertEqual(design["simulation"]["duration_h"], 840.0)
+
+    def test_multiple_minimal_input_requires_frequency_or_interval(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            input_path = root / "multiple_missing_frequency.yaml"
+            input_path.write_text(
+                yaml.safe_dump(
+                    {
+                        "compound": {"compound_name": "demo", "molecular_weight": 300},
+                        "product": {
+                            "formulation": "spray",
+                            "concentration_percent_w_w": 0.25,
+                            "daily_amount_g": 1,
+                        },
+                        "study_design": {"dosing_scenario": "multiple", "n_simulations": 10},
+                        "evidence": {"pubchem": False, "fda": False, "cde": False},
+                    },
+                    allow_unicode=True,
+                ),
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(ValueError, "多次给药最小输入必须填写"):
+                run_from_basic_input(input_path, output_root=root / "runs", fetch_evidence=False)
 
 
 if __name__ == "__main__":

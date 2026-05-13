@@ -110,6 +110,7 @@ calibration_reference:
   vehicle_match_score: 0.8
 
 study_design:
+  dosing_scenario: "single"
   purpose: "exploratory"
   sampling_purposes: ["exploratory", "must_max_use", "be_bridging"]
   n_simulations: 3000

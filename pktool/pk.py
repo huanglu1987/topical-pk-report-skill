@@ -73,9 +73,55 @@ def effective_steady_state_times(
     t_half_eff = max(candidates)
     return {
         "t_half_eff_h": t_half_eff,
+        "t_ss_50_h": t_half_eff,
+        "t_ss_75_h": math.log(4) / math.log(2) * t_half_eff,
         "t_ss_90_h": math.log(10) / math.log(2) * t_half_eff,
         "t_ss_95_h": math.log(20) / math.log(2) * t_half_eff,
+        "t_ss_99_h": math.log(100) / math.log(2) * t_half_eff,
     }
+
+
+def steady_state_frequency_matrix(
+    t_half_eff_h: float,
+    frequency_scenarios: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
+    scenarios = frequency_scenarios or [
+        {"name": "daily_qd", "label": "每日一次", "dosing_interval_h": 24.0},
+        {"name": "weekly_qw", "label": "每周一次", "dosing_interval_h": 168.0},
+        {"name": "weekly_biw", "label": "每周两次", "dosing_interval_h": 84.0},
+    ]
+    targets = [
+        (0.50, "50%"),
+        (0.75, "75%"),
+        (0.90, "90%"),
+        (0.95, "95%"),
+        (0.99, "接近100%(99%)"),
+    ]
+    rows: list[dict[str, Any]] = []
+    for scenario in scenarios:
+        tau = float(scenario.get("dosing_interval_h") or scenario.get("tau_h") or 24.0)
+        tau = max(tau, 1e-9)
+        name = str(scenario.get("name") or f"q{tau:g}h")
+        label = str(scenario.get("label") or name)
+        for fraction, fraction_label in targets:
+            theoretical_h = -math.log(1.0 - fraction) / math.log(2) * t_half_eff_h
+            dose_number = max(1, math.ceil(theoretical_h / tau) + 1)
+            first_dose_time_h = (dose_number - 1) * tau
+            rows.append(
+                {
+                    "frequency": name,
+                    "frequency_label": label,
+                    "dosing_interval_h": tau,
+                    "target_fraction": fraction,
+                    "target_label": fraction_label,
+                    "theoretical_time_h": theoretical_h,
+                    "theoretical_time_day": theoretical_h / 24.0,
+                    "first_dose_number_at_or_after": dose_number,
+                    "first_dose_time_h": first_dose_time_h,
+                    "first_dose_time_day": first_dose_time_h / 24.0,
+                }
+            )
+    return rows
 
 
 def resolve_systemic_pk(compound: dict[str, Any], reference: dict[str, Any]) -> SystemicPK:
