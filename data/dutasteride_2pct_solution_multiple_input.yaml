@@ -1,0 +1,134 @@
+project:
+  product_name: "Dutasteride 2% topical solution multiple dose"
+  compound_name: "dutasteride"
+  indication: "androgenetic alopecia"
+  region: "China/US"
+
+compound:
+  compound_id: "DUTASTERIDE"
+  compound_name: "dutasteride"
+  molecular_weight: 528.5
+  xlogp: 5.4
+  half_life_h: 840
+  volume_l: 400
+  lloq_ng_ml: 0.025
+  safety_cmax_ng_ml: 40
+  safety_auc_ng_h_ml: 161280
+  safety_cmax_source: "DailyMed/FDA Avodart label; chronic oral steady-state Css about 40 ng/mL"
+  safety_auc_source: "DailyMed/FDA Avodart label; cumulative exploratory comparator approximated from Css x 24 weeks"
+  safety_threshold_interpretation: "Internal comparator threshold only; not a regulatory safety limit."
+  elimination_model: "auto"
+  elimination_notes: "DailyMed label describes dose/concentration-dependent elimination and decreased clearance at higher concentrations; no Vmax/Km is available for this topical prediction."
+  value_source: "DailyMed/FDA label plus published oral BE; topical absorption calibrated qualitatively from 0.05% topical study."
+
+reference_pk:
+  source: ""
+  reference_dose_mg:
+  reference_auc_ng_h_ml:
+  reference_cmax_ng_ml:
+
+known_formulations:
+  - name: "Avodart/dutasteride 0.5 mg QD oral steady state"
+    route: "oral"
+    formulation: "soft gelatin capsule"
+    dose_mg: 0.5
+    dose_description: "0.5 mg once daily"
+    single_or_multiple: "multiple"
+    tmax_h: 2.5
+    tmax_range_h: [2, 3]
+    auc_ng_h_ml: 161280
+    half_life_h: 840
+    volume_l: 400
+    fraction_unbound: 0.005
+    metabolism_pathway: "CYP3A4/3A5 hepatic metabolism"
+    dose_proportionality: "nonlinear/concentration-dependent clearance noted in label"
+    linear_dose_range_mg: [0.5, 0.5]
+    accumulation_ratio: 1
+    time_to_ss_h: 4032
+    washout_duration_h: 4200
+    population: "patient"
+    species: "human"
+    source: "DailyMed/FDA label: Css about 40 ng/mL after chronic 0.5 mg/day; 24-week cumulative AUC approximated as 40 x 4032"
+    primary_comparator: true
+    notes: "Multiple-dose comparator over 24 weeks."
+  - name: "Published 0.05% topical solution Phase II PK benchmark"
+    route: "topical"
+    formulation: "solution"
+    dose_mg: 0.5
+    dose_description: "0.05% w/v, 1 mL once daily"
+    single_or_multiple: "single and multiple"
+    cmax_ng_ml: 0.16947
+    tmax_h: 5
+    tmax_range_h: [3, 8]
+    formulation_excipients: ["topical solution vehicle not fully public"]
+    vehicle: "topical solution; public vehicle details incomplete"
+    dose_proportionality: "unknown above 0.05%; high-concentration extrapolation required"
+    linear_dose_range_mg: [0.5, 0.5]
+    population: "patient"
+    species: "human"
+    source: "Panuganti et al. 2025 Cureus Phase II topical dutasteride study"
+    primary_comparator: false
+    notes: "External benchmark for fast absorption judgment and Day168 low systemic concentration."
+
+product:
+  product_name: "Dutasteride 2% w/v topical solution"
+  formulation: "solution"
+  concentration_percent_w_w: 2.0
+  daily_amount_g: 1.0
+  dose_mg_per_application: 20
+  applications_per_day: 1
+  treatment_duration_h: 4032
+  treated_area_cm2: 1.9
+  skin_condition: "AGA scalp target area"
+  max_use_condition: "1 mL once daily over a 1.9 cm2 target scalp area for 24 weeks"
+  occlusion: false
+  vehicle: "ethanol/propylene glycol-like topical solution assumption; verify against final formulation"
+  formulation_excipients: ["volatile solvent", "cosolvent/penetration enhancer assumption"]
+  absorption_fraction_range: [0.000005, 0.001]
+  ka_skin_h_range: [0.05, 0.8]
+  depot_half_life_h_range: [2, 72]
+  lag_time_h_range: [0, 8]
+  enable_fast_absorption: "auto"
+  fast_absorption_evidence:
+    observed_topical_tmax_h: 5
+    observed_topical_cmax_ng_ml: 0.16947
+    source: "0.05% topical solution published benchmark"
+  fast_absorption_fraction_range: [0.10, 0.45]
+  ka_fast_h_range: [0.35, 2.0]
+  fast_lag_time_h_range: [0, 2]
+  early_apparent_volume_l_range: [0.05, 2.5]
+  local_to_central_half_life_h_range: [8, 96]
+  variability_preset: "medium"
+  interindividual_cv:
+  bioavailability_cv:
+
+calibration_reference:
+  source_type: "human_topical"
+  source_citation: "Panuganti et al. 2025 Cureus Phase II topical dutasteride study"
+  concentration_percent: 0.05
+  dose_mg: 0.5
+  observed_tmax_h: 5
+  observed_tmax_h_range: [3, 8]
+  observed_cmax_ng_ml: 0.16947
+  observed_cmax_ng_ml_range: [0.05, 0.5]
+  vehicle_match_score: 0.8
+
+study_design:
+  purpose: "must_max_use"
+  sampling_purposes: ["exploratory", "must_max_use", "be_bridging"]
+  n_simulations: 3000
+  duration_h: 4032
+  dosing_duration_h: 4032
+  time_step_h: 1
+  max_recommended_points: 20
+  candidate_sampling_hours: [0, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 8, 12, 24, 48, 72, 168, 336, 504, 672, 1008, 1344, 2016, 2688, 4032]
+
+evidence:
+  pubchem: false
+  fda: true
+  fda_ingredient: "dutasteride"
+  cde: true
+  cde_keyword: "药代动力学"
+
+report:
+  format: "md,xlsx"

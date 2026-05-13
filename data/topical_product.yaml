@@ -1,0 +1,27 @@
+product_name: Demo 1% topical cream
+formulation: cream
+concentration_percent_w_w: 1.0
+daily_amount_g: 1.0
+dose_mg_per_application: 10.0
+applications_per_day: 1
+dosing_interval_h: 24
+treatment_duration_h: 336
+treated_area_cm2: 600
+max_use_condition: illustrative maximum-use assumption
+occlusion: false
+skin_condition: affected skin
+absorption_fraction_range:
+- 0.0001
+- 0.02
+ka_skin_h_range:
+- 0.02
+- 0.35
+depot_half_life_h_range:
+- 6
+- 96
+lag_time_h_range:
+- 0
+- 12
+interindividual_cv: 0.6
+bioavailability_cv: 0.5
+notes: 外用吸收区间为示例假设；真实项目需由 IVRT/IVPT、探索 PK 或同类案例校准。

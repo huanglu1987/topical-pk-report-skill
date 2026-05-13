@@ -1,0 +1,100 @@
+project:
+  product_name: "Demo 1% topical cream"
+  compound_name: "ivermectin"
+  indication: "rosacea"
+  region: "China/US"
+
+compound:
+  compound_id: "DEMO-IVM"
+  compound_name: "ivermectin"
+  molecular_weight: 875.1
+  xlogp: 5.8
+  half_life_h: 36
+  volume_l: 250
+  lloq_ng_ml: 0.05
+  safety_cmax_ng_ml: 5
+  safety_auc_ng_h_ml: 400
+  safety_cmax_source: "示例阈值；真实项目需引用标签、临床 PK 或 PoD/HED 依据"
+  safety_auc_source: "示例阈值；真实项目需引用标签、临床 PK 或 PoD/HED 依据"
+  safety_threshold_interpretation: "仅用于演示，不可作为注册或临床安全阈值。"
+  value_source: "示例输入，非真实项目结论"
+
+reference_pk:
+  source: ""
+  reference_dose_mg:
+  reference_auc_ng_h_ml:
+  reference_cmax_ng_ml:
+
+known_formulations:
+  - name: "已知口服片剂 PK"
+    route: "oral"
+    formulation: "tablet"
+    dose_mg: 12
+    single_or_multiple: "single"
+    cmax_ng_ml: 3.5
+    tmax_h: 4
+    auc_ng_h_ml: 120
+    half_life_h: 36
+    volume_l: 250
+    fraction_unbound: 0.1
+    metabolism_pathway: "示例代谢通路"
+    dose_proportionality: "示例：未确认"
+    linear_dose_range_mg: [12, 12]
+    tmax_range_h: [2, 6]
+    population: "healthy"
+    species: "human"
+    source: "已有剂型或公开标签，经人工确认后填写"
+    primary_comparator: true
+    notes: "用于约束系统处置参数和暴露比较。"
+  - name: "既有外用制剂公开 PK 线索"
+    route: "topical"
+    formulation: "cream"
+    dose_description: "1% cream, once daily"
+    cmax_ng_ml:
+    tmax_h:
+    auc_ng_h_ml:
+    half_life_h:
+    source: "公开标签/文献/审评资料，待人工确认"
+    primary_comparator: false
+    notes: "如无定量 PK，可保留为空，仅作为报告证据缺口。"
+
+product:
+  product_name: "Demo 1% topical cream"
+  formulation: "cream"
+  concentration_percent_w_w: 1.0
+  daily_amount_g: 1.0
+  applications_per_day: 1
+  treated_area_cm2: 600
+  skin_condition: "affected skin"
+  max_use_condition: "示例最大使用条件"
+  occlusion: false
+  vehicle: "示例乳膏基质"
+  formulation_excipients: ["示例基质，非真实处方"]
+  variability_preset: "medium"
+
+calibration_reference:
+  source_type: "human_topical"
+  source_citation: "示例人体外用 PK 锚点；真实项目需替换"
+  concentration_percent: 1
+  dose_mg: 10
+  observed_tmax_h: 8
+  observed_tmax_h_range: [4, 12]
+  observed_cmax_ng_ml: 0.2
+  observed_cmax_ng_ml_range: [0.05, 0.5]
+  vehicle_match_score: 0.7
+
+study_design:
+  purpose: "exploratory"
+  sampling_purposes: ["exploratory", "must_max_use", "be_bridging"]
+  n_simulations: 1000
+  duration_h: 336
+  max_recommended_points: 14
+
+evidence:
+  pubchem: true
+  fda: true
+  cde: true
+  cde_keyword: "药代动力学"
+
+report:
+  format: "md,xlsx"

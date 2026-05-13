@@ -1,0 +1,7 @@
+parameter,value,unit,source,used_for_model
+reference_dose_mg,12,mg,illustrative,no
+reference_auc_ng_h_ml,120,ng*h/mL,illustrative,comparison_only
+reference_cmax_ng_ml,3.5,ng/mL,illustrative,comparison_only
+half_life_h,36,h,compound_profile,yes
+volume_l,250,L,compound_profile,yes
+clearance_l_h,,L/h,missing,no

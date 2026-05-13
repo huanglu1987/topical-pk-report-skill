@@ -1,0 +1,2 @@
+compound_id,compound_name,molecular_weight,xlogp,tpsa,hbd,hba,half_life_h,clearance_l_h,volume_l,lloq_ng_ml,safety_cmax_ng_ml,safety_auc_ng_h_ml,value_source,notes
+DEMO-001,Demo topical small molecule,875.1,5.8,170.0,3,14,36,,250,0.05,5,400,illustrative_default,示例参数，仅用于工具演示，不可直接用于申报或真实研究决策。

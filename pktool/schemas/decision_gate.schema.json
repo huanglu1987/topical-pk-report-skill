@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["status", "triggers", "metrics", "recommended_actions"],
+  "properties": {
+    "status": {
+      "enum": ["ok", "warning", "blocked_for_decision_use"]
+    },
+    "risk_light": {
+      "enum": ["green", "yellow", "red"]
+    },
+    "triggers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "metrics": {
+      "type": "object"
+    },
+    "known_formulation_gaps": {
+      "type": "array"
+    },
+    "recommended_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

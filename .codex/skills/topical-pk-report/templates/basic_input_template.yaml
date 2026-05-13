@@ -1,0 +1,143 @@
+project:
+  product_name: ""
+  compound_name: ""
+  indication: ""
+  region: "China/US"
+
+compound:
+  compound_id: ""
+  compound_name: ""
+  molecular_weight:
+  xlogp:
+  half_life_h:
+  clearance_l_h:
+  volume_l:
+  lloq_ng_ml:
+  safety_cmax_ng_ml:
+  safety_auc_ng_h_ml:
+  safety_cmax_source: ""
+  safety_auc_source: ""
+  safety_threshold_interpretation: ""
+  elimination_model: "auto"
+  vmax_ng_h:
+  km_ng_ml:
+  elimination_notes: ""
+  value_source: "user_input"
+
+reference_pk:
+  source: ""
+  reference_dose_mg:
+  reference_auc_ng_h_ml:
+  reference_cmax_ng_ml:
+
+known_formulations:
+  - name: ""
+    route: "oral"
+    formulation: ""
+    dose_mg:
+    dose_description: ""
+    single_or_multiple: "single"
+    cmax_ng_ml:
+    cmax_cv:
+    tmax_h:
+    tmax_range_h:
+    tmax_sd_h:
+    auc_ng_h_ml:
+    auc0_t_ng_h_ml:
+    auc0_inf_ng_h_ml:
+    auc_cv:
+    half_life_h:
+    clearance_l_h:
+    volume_l:
+    fraction_unbound:
+    metabolism_pathway: ""
+    active_metabolite: ""
+    dose_proportionality: ""
+    linear_dose_range_mg:
+    accumulation_ratio:
+    time_to_ss_h:
+    lloq_method: ""
+    population: ""
+    formulation_excipients: []
+    vehicle: ""
+    permeation_data: ""
+    protein_binding_concentration_dependence:
+    species: "human"
+    source: ""
+    primary_comparator: true
+    notes: "同一分子既往剂型 PK；用于系统处置锚点和暴露比较。"
+
+public_pk_evidence_plan:
+  required_before_prediction: true
+  sources_to_search:
+    - "FDA/DailyMed label"
+    - "FDA review package or PSG when available"
+    - "CDE/NMPA public guidance or review context when available"
+    - "PubMed/open-access PK publications"
+    - "ClinicalTrials.gov or published topical studies"
+  extraction_status: "not_started"
+
+calibration_reference:
+  source_type: ""
+  source_citation: ""
+  concentration_percent:
+  dose_mg:
+  observed_tmax_h:
+  observed_tmax_h_range:
+  observed_cmax_ng_ml:
+  observed_cmax_ng_ml_range:
+  observed_auc_ng_h_ml:
+  observed_auc_ng_h_ml_range:
+  vehicle_match_score:
+
+product:
+  product_name: ""
+  formulation: "cream"
+  concentration_percent_w_w:
+  daily_amount_g:
+  dose_mg_per_application:
+  applications_per_day: 1
+  treatment_duration_h:
+  treated_area_cm2:
+  skin_condition: "affected skin"
+  max_use_condition: ""
+  occlusion: false
+  vehicle: ""
+  formulation_excipients: []
+  absorption_fraction_range:
+  ka_skin_h_range:
+  depot_half_life_h_range:
+  lag_time_h_range:
+  enable_fast_absorption: "auto"
+  fast_absorption_evidence:
+    observed_topical_tmax_h:
+    observed_topical_cmax_ng_ml:
+    source: ""
+  fast_absorption_fraction_range:
+  ka_fast_h_range:
+  fast_lag_time_h_range:
+  variability_preset: "medium"
+  interindividual_cv:
+  bioavailability_cv:
+  # Deprecated compatibility fields. Prefer volume_l and depot_half_life_h_range.
+  early_apparent_volume_l_range:
+  local_to_central_half_life_h_range:
+
+study_design:
+  purpose: "exploratory"
+  sampling_purposes:
+    - "exploratory"
+  n_simulations: 10000
+  duration_h: 336
+  dosing_duration_h:
+  time_step_h: 1
+  max_recommended_points: 14
+
+evidence:
+  pubchem: true
+  fda: true
+  cde: true
+  cde_keyword: "药代动力学"
+
+report:
+  format: "md,xlsx"

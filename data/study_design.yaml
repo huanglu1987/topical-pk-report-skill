@@ -1,0 +1,30 @@
+simulation:
+  n_simulations: 1000
+  random_seed: 20260512
+  time_step_h: 1
+  duration_h: 336
+candidate_sampling_hours:
+- 0
+- 1
+- 2
+- 4
+- 6
+- 8
+- 12
+- 16
+- 24
+- 36
+- 48
+- 72
+- 96
+- 120
+- 168
+- 216
+- 240
+- 264
+- 288
+- 312
+- 336
+sampling:
+  max_recommended_points: 14
+  notes: 候选采血点可按中心操作可行性调整。
