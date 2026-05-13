@@ -88,7 +88,7 @@ python3 -m pktool.cli run-report \
   --no-fetch
 ```
 
-最小模式会使用默认半衰期、分布容积、变异度和保守外用吸收范围。它适合内部快速判断和采血点初筛，不适合直接用于 CRO SOW、正式 MUsT/max-use 方案或监管材料。
+最小模式在缺少同分子 PK 锚点时，会启用通用兜底假设，例如 `t1/2 = 12 h`、`V = 50 L`、`medium variability` 和保守外用吸收范围。这里的兜底值不是该分子的历史数据，也不是可引用证据；报告会把这些参数标记为 `default` 或 `model_default_or_derived`。它适合内部快速判断和采血点初筛，不适合直接用于 CRO SOW、正式 MUsT/max-use 方案或监管材料。
 
 如需更可靠的结果，再补充：半衰期、V/CL、已有剂型 Cmax/AUC/Tmax、LLOQ、安全阈值来源、给药面积、最大使用条件和校准参考。
 

@@ -2,6 +2,8 @@
 # Required: molecule, concentration, dosage form, and dosing amount.
 # If dose_mg_per_application is blank, the tool calculates:
 # concentration_percent_w_w x 10 x daily_amount_g / applications_per_day.
+# Without verified same-molecule PK anchors, the tool may use generic fallback
+# assumptions; these are not molecule-specific historical data or evidence.
 
 compound:
   compound_name: "efinaconazole"

@@ -42,7 +42,7 @@ Use `templates/minimal_input_template.yaml` when the user only has these basics.
 dose_mg_per_application = concentration_percent_w_w x 10 x daily_amount_g / applications_per_day
 ```
 
-Default assumptions are applied when PK anchors are absent: half-life 12 h, V 50 L, medium variability, exploratory purpose, and conservative topical absorption ranges. The report must clearly state these defaults and treat the output as exploratory only.
+Generic fallback assumptions are applied only when same-molecule PK anchors are absent: half-life 12 h, V 50 L, medium variability, exploratory purpose, and conservative topical absorption ranges. These fallback values are not historical data for the molecule and must not be cited as evidence. The report must clearly mark them as default/model-derived assumptions and treat the output as exploratory only.
 
 If the product is not once daily or single-application, also ask for `applications_per_day` and `treatment_duration_h`.
 
