@@ -1,0 +1,29 @@
+# Minimal runnable input for teammate onboarding.
+# Required: molecule, concentration, dosage form, and dosing amount.
+# If dose_mg_per_application is blank, the tool calculates:
+# concentration_percent_w_w x 10 x daily_amount_g / applications_per_day.
+
+compound:
+  compound_name: "efinaconazole"
+
+product:
+  formulation: "film-forming solution"
+  concentration_percent_w_w: 3.0
+  daily_amount_g: 4.0
+  applications_per_day: 1
+  # Optional alternative: fill this directly when the active dose is already known.
+  dose_mg_per_application:
+
+study_design:
+  purpose: "exploratory"
+  sampling_purposes: ["exploratory"]
+  n_simulations: 1000
+  duration_h: 168
+
+evidence:
+  pubchem: true
+  fda: true
+  cde: false
+
+report:
+  format: "md,xlsx"

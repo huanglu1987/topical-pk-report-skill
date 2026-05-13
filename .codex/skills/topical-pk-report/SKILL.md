@@ -27,16 +27,32 @@ Run commands from that repository root.
 
 It generates run-specific inputs, fetches public evidence when requested, runs Monte Carlo exposure simulation, recommends purpose-specific sampling times, and creates Markdown/Excel reports plus structured CSV/JSON outputs.
 
-## Required Input
+## Minimum Runnable Input
+
+For teammate-facing use, the skill can start from only four pieces of product information:
+
+- specific molecule: `compound.compound_name`
+- specific dosage form: `product.formulation`
+- concentration: `product.concentration_percent_w_w`
+- dosing amount: either `product.daily_amount_g` or `product.dose_mg_per_application`
+
+Use `templates/minimal_input_template.yaml` when the user only has these basics. If `dose_mg_per_application` is missing, the tool derives it as:
+
+```text
+dose_mg_per_application = concentration_percent_w_w x 10 x daily_amount_g / applications_per_day
+```
+
+Default assumptions are applied when PK anchors are absent: half-life 12 h, V 50 L, medium variability, exploratory purpose, and conservative topical absorption ranges. The report must clearly state these defaults and treat the output as exploratory only.
+
+If the product is not once daily or single-application, also ask for `applications_per_day` and `treatment_duration_h`.
+
+## Recommended Enhanced Input
 
 Ask the user for only the missing items that materially affect the report:
 
-- compound name
-- dosage form
-- concentration or dose per application
-- daily amount or dose frequency
-- single-dose or multiple-dose duration
 - study purpose: `exploratory`, `must_max_use`, or `be_bridging`
+- single-dose or multiple-dose duration
+- treated area and max-use condition
 - sampling purposes if different from the main study purpose
 - variability preset: `low`, `medium`, or `high` when the user has a preference
 - known reference PK anchor if available: half-life, V, CL, Cmax, AUC, LLOQ
@@ -64,7 +80,7 @@ Use non-topical systemic formulations, especially oral or injection, as the pref
 
 ## Workflow
 
-1. Create or update a YAML input file using `templates/basic_input_template.yaml`.
+1. Create or update a YAML input file using `templates/minimal_input_template.yaml` for onboarding, or `templates/basic_input_template.yaml` for a fuller PK run.
 2. Run from the project root:
 
 ```bash

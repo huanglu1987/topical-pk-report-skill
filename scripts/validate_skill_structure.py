@@ -13,6 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILL_DIR = ROOT / ".codex" / "skills" / "topical-pk-report"
 SKILL_MD = SKILL_DIR / "SKILL.md"
 TEMPLATE = SKILL_DIR / "templates" / "basic_input_template.yaml"
+MINIMAL_TEMPLATE = SKILL_DIR / "templates" / "minimal_input_template.yaml"
+DATA_MINIMAL_TEMPLATE = ROOT / "data" / "minimal_input_template.yaml"
 
 
 def require(path: Path) -> None:
@@ -24,6 +26,8 @@ def main() -> int:
     for path in [
         SKILL_MD,
         TEMPLATE,
+        MINIMAL_TEMPLATE,
+        DATA_MINIMAL_TEMPLATE,
         ROOT / "pktool" / "simulation.py",
         ROOT / "pktool" / "sampling.py",
         ROOT / "pktool" / "report.py",
@@ -42,6 +46,8 @@ def main() -> int:
         "be_bridging",
         "parameter_provenance.csv",
         "dose_extrapolation_sensitivity.csv",
+        "Minimum Runnable Input",
+        "minimal_input_template.yaml",
     ]:
         if token not in skill_text:
             raise SystemExit(f"SKILL.md is missing V1.1 token: {token}")
@@ -59,6 +65,17 @@ def main() -> int:
             raise SystemExit(f"Template is missing {section}.{key}")
     if "calibration_reference" not in data:
         raise SystemExit("Template is missing calibration_reference")
+
+    minimal = yaml.safe_load(MINIMAL_TEMPLATE.read_text(encoding="utf-8"))
+    minimal_checks = [
+        ("compound", "compound_name"),
+        ("product", "formulation"),
+        ("product", "concentration_percent_w_w"),
+        ("product", "daily_amount_g"),
+    ]
+    for section, key in minimal_checks:
+        if key not in minimal.get(section, {}):
+            raise SystemExit(f"Minimal template is missing {section}.{key}")
 
     print("Skill package validation passed.")
     return 0

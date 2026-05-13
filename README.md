@@ -62,6 +62,36 @@ python -m pip install -e .
 
 ## 快速开始
 
+### 同事最小输入模式
+
+如果同事只是想先跑一个探索性预测，最低只需要填写 4 类信息：
+
+| 必填信息 | YAML 字段 | 示例 |
+|---|---|---|
+| 具体分子 | `compound.compound_name` | `efinaconazole` |
+| 具体剂型 | `product.formulation` | `film-forming solution` |
+| 浓度 | `product.concentration_percent_w_w` | `3.0` |
+| 给药剂量 | `product.daily_amount_g` 或 `product.dose_mg_per_application` | `4.0 g` 或 `120 mg` |
+
+最小模板位置：
+
+```bash
+data/minimal_input_template.yaml
+```
+
+运行示例：
+
+```bash
+python3 -m pktool.cli run-report \
+  --input data/minimal_input_template.yaml \
+  --output-root runs \
+  --no-fetch
+```
+
+最小模式会使用默认半衰期、分布容积、变异度和保守外用吸收范围。它适合内部快速判断和采血点初筛，不适合直接用于 CRO SOW、正式 MUsT/max-use 方案或监管材料。
+
+如需更可靠的结果，再补充：半衰期、V/CL、已有剂型 Cmax/AUC/Tmax、LLOQ、安全阈值来源、给药面积、最大使用条件和校准参考。
+
 ```bash
 pktool init-demo
 pktool fetch-pubchem --name ivermectin
