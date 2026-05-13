@@ -11,8 +11,10 @@ python3 -m pip install -e "$REPO_ROOT"
 mkdir -p "$CODEX_HOME/skills"
 rm -rf "$SKILL_TARGET"
 cp -R "$SKILL_SOURCE" "$SKILL_TARGET"
+printf "%s\n" "$REPO_ROOT" > "$SKILL_TARGET/.pktool_root"
 
 python3 "$REPO_ROOT/scripts/validate_skill_structure.py"
+python3 "$SKILL_TARGET/scripts/check_pktool_install.py"
 
 echo "Installed topical-pk-report skill to: $SKILL_TARGET"
 echo "Installed topical-pk-tool Python package from: $REPO_ROOT"

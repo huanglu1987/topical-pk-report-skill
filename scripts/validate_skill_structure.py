@@ -15,6 +15,7 @@ SKILL_MD = SKILL_DIR / "SKILL.md"
 TEMPLATE = SKILL_DIR / "templates" / "basic_input_template.yaml"
 MINIMAL_TEMPLATE = SKILL_DIR / "templates" / "minimal_input_template.yaml"
 DATA_MINIMAL_TEMPLATE = ROOT / "data" / "minimal_input_template.yaml"
+CHECK_SCRIPT = SKILL_DIR / "scripts" / "check_pktool_install.py"
 
 
 def require(path: Path) -> None:
@@ -28,6 +29,7 @@ def main() -> int:
         TEMPLATE,
         MINIMAL_TEMPLATE,
         DATA_MINIMAL_TEMPLATE,
+        CHECK_SCRIPT,
         ROOT / "pktool" / "simulation.py",
         ROOT / "pktool" / "sampling.py",
         ROOT / "pktool" / "report.py",
@@ -48,6 +50,8 @@ def main() -> int:
         "dose_extrapolation_sensitivity.csv",
         "Minimum Runnable Input",
         "minimal_input_template.yaml",
+        "No Fallback Rule",
+        "check_pktool_install.py",
     ]:
         if token not in skill_text:
             raise SystemExit(f"SKILL.md is missing V1.1 token: {token}")

@@ -16,16 +16,43 @@ The skill follows the V1.1 tool workflow and has four mandatory layers:
 3. V1.1 decision gate review: calibration adequacy, safety-threshold source, dose extrapolation, nonlinear risk, terminal follow-up, and missing critical fields.
 4. Prediction and report generation: systemic exposure, purpose-specific sampling, single-dose or multiple-dose metrics, reverse calibration, and dose sensitivity.
 
-The companion local tool is distributed in the same GitHub repository as this skill. When running the tool, first locate the repository root by checking:
+The companion local tool is distributed in the same GitHub repository as this skill. A valid run must execute `python3 -m pktool.cli run-report`; otherwise it is not a tool-generated report.
+
+Before creating any report, run this preflight:
+
+```bash
+python3 -m pktool.cli --help
+```
+
+If this fails, run the installed skill checker:
+
+```bash
+python3 ~/.codex/skills/topical-pk-report/scripts/check_pktool_install.py
+```
+
+If the checker finds a local companion repository, install it with:
+
+```bash
+python3 ~/.codex/skills/topical-pk-report/scripts/check_pktool_install.py --install
+```
+
+If no companion repository is found, tell the user to clone and install the full GitHub repository. Do not continue to generate a manual Markdown report.
+
+When running the tool, locate the repository root by checking:
 
 1. the current working directory, if it contains `pktool/` and `pyproject.toml`;
-2. the environment variable `TOPICAL_PK_TOOL_ROOT`, if set;
-3. a common clone path such as `~/Projects/topical-pk-report-skill`;
-4. on the original authoring machine only, `/Users/huanglu/Projects/外用制剂PK采血点建模`.
+2. the marker file `~/.codex/skills/topical-pk-report/.pktool_root`, if present;
+3. the environment variable `TOPICAL_PK_TOOL_ROOT`, if set;
+4. a common clone path such as `~/Projects/topical-pk-report-skill`;
+5. on the original authoring machine only, `/Users/huanglu/Projects/外用制剂PK采血点建模`.
 
 Run commands from that repository root.
 
 It generates run-specific inputs, fetches public evidence when requested, runs Monte Carlo exposure simulation, recommends purpose-specific sampling times, and creates Markdown/Excel reports plus structured CSV/JSON outputs.
+
+## No Fallback Rule
+
+If `pktool` is not installed or cannot be located, stop and report the installation problem. Do not write a substitute narrative report, do not say a Monte Carlo report was generated, and do not create a Markdown file with a different structure. The expected report must come from `outputs/reports/pk_sampling_report.md` under a `runs/<timestamp>_<compound>/` directory.
 
 ## Minimum Runnable Input
 
@@ -81,7 +108,13 @@ Use non-topical systemic formulations, especially oral or injection, as the pref
 ## Workflow
 
 1. Create or update a YAML input file using `templates/minimal_input_template.yaml` for onboarding, or `templates/basic_input_template.yaml` for a fuller PK run.
-2. Run from the project root:
+2. Verify the companion tool is available:
+
+```bash
+python3 -m pktool.cli --help
+```
+
+3. Run from the project root:
 
 ```bash
 python3 -m pktool.cli run-report --input <input_yaml>
@@ -89,9 +122,9 @@ python3 -m pktool.cli run-report --input <input_yaml>
 
 Use `--no-fetch` when public evidence was already manually captured or when the run must avoid external network calls.
 
-3. Review the generated run directory under `runs/`.
-4. Read `simulation_summary.json`, `sampling_recommendation.csv`, `parameter_provenance.csv`, and `dose_extrapolation_sensitivity.csv` before summarizing.
-5. Report the Markdown and Excel paths to the user and state the decision-gate status.
+4. Review the generated run directory under `runs/`.
+5. Read `simulation_summary.json`, `sampling_recommendation.csv`, `parameter_provenance.csv`, and `dose_extrapolation_sensitivity.csv` before summarizing.
+6. Report the Markdown and Excel paths to the user and state the decision-gate status.
 
 ## Output
 
@@ -146,6 +179,7 @@ Do not convert a `blocked_for_decision_use` output into a definitive clinical co
 - Public lookups are evidence cache only; PK parameters must be manually confirmed before regulatory use.
 - Do not upload confidential formulation, raw PK data, or company SMILES lists to external services.
 - Do not invent Vmax/Km, PopPK, PBPK, or nonlinear parameters. If nonlinear risk is detected but Vmax/Km are absent, report the gate trigger and keep the run exploratory.
+- Do not create manual fallback reports when `pktool` is unavailable. Installation failure is a blocker, not a reason to change the report format.
 
 ## Required Public PK Evidence Table
 

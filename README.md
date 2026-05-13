@@ -30,6 +30,7 @@ chmod +x install.sh
 
 - 以 editable 方式安装本地 Python 工具包 `topical-pk-tool`。
 - 把 `.codex/skills/topical-pk-report` 安装到 `${CODEX_HOME:-$HOME/.codex}/skills/topical-pk-report`。
+- 在已安装 Skill 中写入 `.pktool_root`，让 Codex 能找到配套工具仓库。
 
 也可以手动安装 Skill：
 
@@ -43,7 +44,30 @@ python3 -m pip install -e .
 
 ```bash
 python3 scripts/validate_skill_structure.py
+python3 ~/.codex/skills/topical-pk-report/scripts/check_pktool_install.py
 python3 -m unittest discover -s tests
+```
+
+如果同事只安装了 Skill 文件夹，没有 clone 完整仓库或没有运行 `install.sh`，Codex 可能找不到 `pktool`。这种情况下**不要接受手工生成的替代 Markdown 报告**，先按下面方式修复安装：
+
+```bash
+git clone https://github.com/huanglu1987/topical-pk-report-skill.git
+cd topical-pk-report-skill
+chmod +x install.sh
+./install.sh
+```
+
+如果仓库已经 clone 到其他路径：
+
+```bash
+export TOPICAL_PK_TOOL_ROOT=/absolute/path/to/topical-pk-report-skill
+python3 ~/.codex/skills/topical-pk-report/scripts/check_pktool_install.py --install
+```
+
+真正安装成功的标志是下面命令能输出帮助信息：
+
+```bash
+python3 -m pktool.cli --help
 ```
 
 ## 工具安装
@@ -87,6 +111,8 @@ python3 -m pktool.cli run-report \
   --output-root runs \
   --no-fetch
 ```
+
+标准报告必须来自 `runs/<timestamp>_<compound>/outputs/reports/pk_sampling_report.md`。如果报告中出现“未执行 Monte Carlo 自动模拟”或结构与本 README 描述不一致，说明没有调用到 `pktool`，需要先修复安装。
 
 最小模式在缺少同分子 PK 锚点时，会启用通用兜底假设，例如 `t1/2 = 12 h`、`V = 50 L`、`medium variability` 和保守外用吸收范围。这里的兜底值不是该分子的历史数据，也不是可引用证据；报告会把这些参数标记为 `default` 或 `model_default_or_derived`。它适合内部快速判断和采血点初筛，不适合直接用于 CRO SOW、正式 MUsT/max-use 方案或监管材料。
 
