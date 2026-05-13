@@ -124,6 +124,7 @@ product:
   local_to_central_half_life_h_range:
 
 study_design:
+  dosing_scenario: "single"
   purpose: "exploratory"
   sampling_purposes:
     - "exploratory"

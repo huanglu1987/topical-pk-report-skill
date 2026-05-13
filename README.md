@@ -88,7 +88,7 @@ python -m pip install -e .
 
 ### 同事最小输入模式
 
-如果同事只是想先跑一个探索性预测，最低只需要填写 4 类信息：
+如果同事只是想先跑一个探索性预测，最低只需要填写 5 类信息：
 
 | 必填信息 | YAML 字段 | 示例 |
 |---|---|---|
@@ -96,6 +96,7 @@ python -m pip install -e .
 | 具体剂型 | `product.formulation` | `film-forming solution` |
 | 浓度 | `product.concentration_percent_w_w` | `3.0` |
 | 给药剂量 | `product.daily_amount_g` 或 `product.dose_mg_per_application` | `4.0 g` 或 `120 mg` |
+| 单次或多次 | `study_design.dosing_scenario` | `single` 或 `multiple` |
 
 最小模板位置：
 
@@ -113,6 +114,12 @@ python3 -m pktool.cli run-report \
 ```
 
 标准报告必须来自 `runs/<timestamp>_<compound>/outputs/reports/pk_sampling_report.md`。如果报告中出现“未执行 Monte Carlo 自动模拟”或结构与本 README 描述不一致，说明没有调用到 `pktool`，需要先修复安装。
+
+`dosing_scenario` 的默认规则：
+
+- `single`：默认单次给药，给药持续 24 h，模拟到 168 h。
+- `multiple`：默认每日给药 28 天，并额外模拟末次给药后 7 天。
+- 如已知真实周期，可用 `product.treatment_duration_h`、`study_design.dosing_duration_h` 或 `study_design.duration_h` 覆盖默认值。
 
 最小模式在缺少同分子 PK 锚点时，会启用通用兜底假设，例如 `t1/2 = 12 h`、`V = 50 L`、`medium variability` 和保守外用吸收范围。这里的兜底值不是该分子的历史数据，也不是可引用证据；报告会把这些参数标记为 `default` 或 `model_default_or_derived`。它适合内部快速判断和采血点初筛，不适合直接用于 CRO SOW、正式 MUsT/max-use 方案或监管材料。
 

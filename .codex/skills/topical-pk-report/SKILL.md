@@ -56,12 +56,13 @@ If `pktool` is not installed or cannot be located, stop and report the installat
 
 ## Minimum Runnable Input
 
-For teammate-facing use, the skill can start from only four pieces of product information:
+For teammate-facing use, the skill can start from five pieces of product information:
 
 - specific molecule: `compound.compound_name`
 - specific dosage form: `product.formulation`
 - concentration: `product.concentration_percent_w_w`
 - dosing amount: either `product.daily_amount_g` or `product.dose_mg_per_application`
+- dosing scenario: `study_design.dosing_scenario`, either `single` or `multiple`
 
 Use `templates/minimal_input_template.yaml` when the user only has these basics. If `dose_mg_per_application` is missing, the tool derives it as:
 
@@ -72,6 +73,12 @@ dose_mg_per_application = concentration_percent_w_w x 10 x daily_amount_g / appl
 Generic fallback assumptions are applied only when same-molecule PK anchors are absent: half-life 12 h, V 50 L, medium variability, exploratory purpose, and conservative topical absorption ranges. These fallback values are not historical data for the molecule and must not be cited as evidence. The report must clearly mark them as default/model-derived assumptions and treat the output as exploratory only.
 
 If the product is not once daily or single-application, also ask for `applications_per_day` and `treatment_duration_h`.
+
+Default duration logic:
+
+- `single`: defaults to one application over 24 h and a 168 h simulation window.
+- `multiple`: defaults to once-daily dosing for 28 days and a 7-day post-last-dose follow-up window.
+- Explicit `product.treatment_duration_h`, `study_design.dosing_duration_h`, or `study_design.duration_h` overrides these defaults.
 
 ## Recommended Enhanced Input
 

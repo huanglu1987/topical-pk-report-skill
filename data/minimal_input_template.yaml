@@ -1,5 +1,5 @@
 # Minimal runnable input for teammate onboarding.
-# Required: molecule, concentration, dosage form, and dosing amount.
+# Required: molecule, concentration, dosage form, dosing amount, and dosing scenario.
 # If dose_mg_per_application is blank, the tool calculates:
 # concentration_percent_w_w x 10 x daily_amount_g / applications_per_day.
 # Without verified same-molecule PK anchors, the tool may use generic fallback
@@ -17,6 +17,8 @@ product:
   dose_mg_per_application:
 
 study_design:
+  # Use "single" for single dose or "multiple" for repeated dosing.
+  dosing_scenario: "single"
   purpose: "exploratory"
   sampling_purposes: ["exploratory"]
   n_simulations: 1000

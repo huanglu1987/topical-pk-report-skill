@@ -63,6 +63,7 @@ def main() -> int:
         ("product", "variability_preset"),
         ("study_design", "purpose"),
         ("study_design", "sampling_purposes"),
+        ("study_design", "dosing_scenario"),
     ]
     for section, key in checks:
         if key not in data.get(section, {}):
@@ -76,6 +77,7 @@ def main() -> int:
         ("product", "formulation"),
         ("product", "concentration_percent_w_w"),
         ("product", "daily_amount_g"),
+        ("study_design", "dosing_scenario"),
     ]
     for section, key in minimal_checks:
         if key not in minimal.get(section, {}):

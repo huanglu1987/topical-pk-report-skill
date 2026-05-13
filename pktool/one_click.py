@@ -182,6 +182,21 @@ def _default_absorption_range(compound: dict[str, Any], product: dict[str, Any])
     return [0.0001, 0.02]
 
 
+def _dosing_scenario(study: dict[str, Any], product: dict[str, Any]) -> str:
+    raw = str(
+        study.get("dosing_scenario")
+        or study.get("dosing_type")
+        or product.get("dosing_scenario")
+        or product.get("dosing_type")
+        or ""
+    ).strip().lower()
+    if raw in {"single", "single_dose", "single-dose", "单次", "单次给药"}:
+        return "single"
+    if raw in {"multiple", "multiple_dose", "multiple-dose", "repeat", "repeated", "多次", "多次给药", "重复给药"}:
+        return "multiple"
+    return ""
+
+
 def write_input_files(
     input_data: dict[str, Any],
     run_dir: str | Path,
@@ -289,8 +304,28 @@ def write_input_files(
     dose_mg = _dose_mg_per_application(product)
     applications_per_day = int(to_float(product.get("applications_per_day"), 1) or 1)
     dosing_interval_h = float(product.get("dosing_interval_h") or 24 / applications_per_day)
-    simulation_duration_h = float(study.get("duration_h") or product.get("simulation_duration_h") or product.get("treatment_duration_h") or 336)
-    treatment_duration_h = float(product.get("treatment_duration_h") or study.get("dosing_duration_h") or simulation_duration_h)
+    dosing_scenario = _dosing_scenario(study, product)
+    explicit_treatment_duration_h = to_float(product.get("treatment_duration_h")) or to_float(study.get("dosing_duration_h"))
+    explicit_simulation_duration_h = to_float(study.get("duration_h")) or to_float(product.get("simulation_duration_h"))
+    if explicit_treatment_duration_h is not None:
+        treatment_duration_h = float(explicit_treatment_duration_h)
+    elif dosing_scenario == "single":
+        treatment_duration_h = 24.0
+    elif dosing_scenario == "multiple":
+        treatment_duration_h = 672.0
+    elif explicit_simulation_duration_h is not None:
+        treatment_duration_h = float(explicit_simulation_duration_h)
+    else:
+        treatment_duration_h = 336.0
+
+    if explicit_simulation_duration_h is not None:
+        simulation_duration_h = float(explicit_simulation_duration_h)
+    elif dosing_scenario == "single":
+        simulation_duration_h = 168.0
+    elif dosing_scenario == "multiple":
+        simulation_duration_h = treatment_duration_h + 168.0
+    else:
+        simulation_duration_h = treatment_duration_h
 
     product_path = data_dir / "topical_product.yaml"
     write_yaml(
@@ -303,6 +338,7 @@ def write_input_files(
             "dose_mg_per_application": dose_mg,
             "applications_per_day": applications_per_day,
             "dosing_interval_h": dosing_interval_h,
+            "dosing_scenario": dosing_scenario or "",
             "treatment_duration_h": treatment_duration_h,
             "treated_area_cm2": product.get("treated_area_cm2", ""),
             "max_use_condition": product.get("max_use_condition", "用户输入的最大使用条件或常规用药条件"),
@@ -339,6 +375,7 @@ def write_input_files(
                 "time_step_h": float(study.get("time_step_h", 1)),
                 "duration_h": simulation_duration_h,
             },
+            "dosing_scenario": dosing_scenario or "",
             "purpose": purpose_override or study.get("purpose", "exploratory"),
             "sampling_purposes": study.get("sampling_purposes", [purpose_override] if purpose_override else ["exploratory", "must_max_use", "be_bridging"]),
             "candidate_sampling_hours": study.get("candidate_sampling_hours", DEFAULT_CANDIDATE_SAMPLING_HOURS),

@@ -100,6 +100,37 @@ class TestSimulation(unittest.TestCase):
         self.assertEqual(assessment["model"], "first_order")
         self.assertTrue(assessment["nonlinear_flag"])
 
+    def test_minimal_dosing_scenario_sets_default_duration(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            input_path = root / "single.yaml"
+            base = {
+                "compound": {"compound_name": "demo", "molecular_weight": 300},
+                "product": {
+                    "formulation": "spray",
+                    "concentration_percent_w_w": 0.25,
+                    "daily_amount_g": 1,
+                    "applications_per_day": 1,
+                },
+                "study_design": {"dosing_scenario": "single", "n_simulations": 10},
+                "evidence": {"pubchem": False, "fda": False, "cde": False},
+            }
+            input_path.write_text(yaml.safe_dump(base, allow_unicode=True), encoding="utf-8")
+            result = run_from_basic_input(input_path, output_root=root / "runs", fetch_evidence=False)
+            product = yaml.safe_load(Path(result["input_files"]["product"]).read_text(encoding="utf-8"))
+            self.assertEqual(product["dosing_scenario"], "single")
+            self.assertEqual(product["treatment_duration_h"], 24.0)
+
+            input_path = root / "multiple.yaml"
+            base["study_design"] = {"dosing_scenario": "multiple", "n_simulations": 10}
+            input_path.write_text(yaml.safe_dump(base, allow_unicode=True), encoding="utf-8")
+            result = run_from_basic_input(input_path, output_root=root / "runs2", fetch_evidence=False)
+            product = yaml.safe_load(Path(result["input_files"]["product"]).read_text(encoding="utf-8"))
+            design = yaml.safe_load(Path(result["input_files"]["design"]).read_text(encoding="utf-8"))
+            self.assertEqual(product["dosing_scenario"], "multiple")
+            self.assertEqual(product["treatment_duration_h"], 672.0)
+            self.assertEqual(design["simulation"]["duration_h"], 840.0)
+
 
 if __name__ == "__main__":
     unittest.main()
