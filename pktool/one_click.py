@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import re
 from datetime import datetime
 from pathlib import Path
@@ -295,6 +296,13 @@ def _default_frequency_scenarios(study: dict[str, Any]) -> list[dict[str, Any]]:
     ]
 
 
+def _steady_state_default_treatment_duration_h(t_half_eff_h: float, dosing_interval_h: float) -> float:
+    tau_h = max(float(dosing_interval_h), 1e-9)
+    t_ss_99_h = math.log(100) / math.log(2) * max(float(t_half_eff_h), 1e-9)
+    first_dose_time_at_or_after_99 = math.ceil(t_ss_99_h / tau_h) * tau_h
+    return first_dose_time_at_or_after_99 + tau_h
+
+
 def write_input_files(
     input_data: dict[str, Any],
     run_dir: str | Path,
@@ -421,7 +429,10 @@ def write_input_files(
     elif dosing_scenario == "single":
         treatment_duration_h = 24.0
     elif dosing_scenario == "multiple":
-        treatment_duration_h = 672.0
+        treatment_duration_h = _steady_state_default_treatment_duration_h(
+            t_half_eff_default_h,
+            dosing_interval_h,
+        )
     elif explicit_simulation_duration_h is not None:
         treatment_duration_h = float(explicit_simulation_duration_h)
     else:
@@ -432,7 +443,7 @@ def write_input_files(
     elif dosing_scenario == "single":
         simulation_duration_h = single_default_duration_h
     elif dosing_scenario == "multiple":
-        simulation_duration_h = treatment_duration_h + 168.0
+        simulation_duration_h = treatment_duration_h + max(168.0, 3.0 * t_half_eff_default_h)
     else:
         simulation_duration_h = treatment_duration_h
 

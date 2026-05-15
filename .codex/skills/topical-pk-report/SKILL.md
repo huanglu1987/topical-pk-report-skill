@@ -50,6 +50,8 @@ Run commands from that repository root.
 
 It generates run-specific inputs, fetches public evidence when requested, runs Monte Carlo exposure simulation, recommends purpose-specific sampling times, and creates Markdown/Excel reports plus structured CSV/JSON outputs.
 
+For reproducibility checks, do not recreate YAML from natural language. Use the locked YAML files under `data/reproducible_inputs/` from the companion repository, especially for the dutasteride 2% 20 mg single, daily-QD, and weekly-QW reference runs. These files fix the input assumptions, random seed, and simulation count used by the reference reports.
+
 ## No Fallback Rule
 
 If `pktool` is not installed or cannot be located, stop and report the installation problem. Do not write a substitute narrative report, do not say a Monte Carlo report was generated, and do not create a Markdown file with a different structure. The expected report must come from `outputs/reports/pk_sampling_report.md` under a `runs/<timestamp>_<compound>/` directory.
@@ -78,7 +80,7 @@ If the product is multiple-dose, do not proceed until the frequency is explicit.
 Default duration logic:
 
 - `single`: defaults to one application over 24 h. The simulation window is at least 168 h and is extended to at least 3 x `t_half_eff` for long half-life or slow depot products, so terminal elimination has at least two late follow-up points.
-- `multiple`: requires `study_design.dosing_frequency` or `product.dosing_interval_h`; when only the frequency is provided, defaults to 28 days and a 7-day post-last-dose follow-up window.
+- `multiple`: requires `study_design.dosing_frequency` or `product.dosing_interval_h`; when only the frequency is provided, defaults to a dosing window that reaches the near-100% steady-state dose time. Near-100% means 99%, because true 100% is a theoretical asymptote. The simulation window then adds at least 168 h or 3 x `t_half_eff` after the last dose, whichever is longer.
 - Explicit `product.treatment_duration_h`, `study_design.dosing_duration_h`, or `study_design.duration_h` overrides these defaults.
 
 For multiple-dose planning, always include a steady-state frequency matrix for:

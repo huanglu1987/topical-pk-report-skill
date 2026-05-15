@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "topical-pk-tool"
-version = "0.1.0"
+version = "0.1.1"
 description = "Local MVP for topical systemic exposure simulation and PK sampling design."
 readme = "README.md"
 requires-python = ">=3.10"

@@ -105,6 +105,20 @@ python -m pip install -e .
 data/minimal_input_template.yaml
 ```
 
+可直接在 GitHub 页面复制的度他雄胺 single / daily_qd / weekly_qw 输入模板见：
+
+```bash
+docs/COPYABLE_INPUT_TEMPLATES.md
+```
+
+如果目标是复现既有度他雄胺 2% 20 mg 报告，不要让 Codex 根据自然语言重新生成 YAML；直接运行：
+
+```bash
+python3 -m pktool.cli run-report --input data/reproducible_inputs/dutasteride_2pct_20mg_single_locked.yaml --no-fetch
+python3 -m pktool.cli run-report --input data/reproducible_inputs/dutasteride_2pct_20mg_multiple_daily_qd_steady_state_locked.yaml --no-fetch
+python3 -m pktool.cli run-report --input data/reproducible_inputs/dutasteride_2pct_20mg_multiple_weekly_qw_steady_state_locked.yaml --no-fetch
+```
+
 运行示例：
 
 ```bash
@@ -119,7 +133,7 @@ python3 -m pktool.cli run-report \
 `dosing_scenario` 的默认规则：
 
 - `single`：默认单次给药，给药持续 24 h；模拟窗口至少 168 h。若半衰期或 depot 释放较长，会自动延长到至少 3 x `t_half_eff`，并在采血点中加入至少 2 个末端相确认点。
-- `multiple`：必须填写 `study_design.dosing_frequency` 或 `product.dosing_interval_h`；如只填 `dosing_frequency`，默认给药 28 天，并额外模拟末次给药后 7 天。
+- `multiple`：必须填写 `study_design.dosing_frequency` 或 `product.dosing_interval_h`；如只填给药频率，默认给药窗口会覆盖到接近 100% 稳态（按 99% 计）对应的给药时点，并额外模拟末次给药后至少 168 h 或 3 x `t_half_eff`（取较大者）。
 - 如已知真实周期，可用 `product.treatment_duration_h`、`study_design.dosing_duration_h` 或 `study_design.duration_h` 覆盖默认值。
 
 `study_design.dosing_frequency` 可直接控制实际模拟给药间隔；多次给药频率规划还会默认额外输出三种稳态情景：

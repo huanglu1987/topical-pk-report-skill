@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.1.1 - 2026-05-15
+
+- Changed the default multiple-dose one-click duration logic from a 28-day run to a near-100% steady-state run when only dosing frequency is provided.
+- Added locked dutasteride 2% 20 mg reproducible input YAML files for single-dose, daily-QD multiple-dose, and weekly-QW multiple-dose reports.
+- Added reproducibility tests to protect key report-driving inputs: random seed, simulation count, reference PK anchors, absorption range, depot half-life range, and variability preset.
+- Added `pktool_version` and `random_seed` to `simulation_summary.json` and the Markdown report summary.
+
 ## V1.1 - 2026-05-13
 
 - Added `decision_gate` with `ok` / `warning` / `blocked_for_decision_use` states.

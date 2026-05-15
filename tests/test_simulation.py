@@ -1,3 +1,4 @@
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -88,9 +89,12 @@ class TestSimulation(unittest.TestCase):
             )
             result = run_from_basic_input(input_path, output_root=root / "runs", fetch_evidence=False)
             reference = pd.read_csv(result["input_files"]["reference"])
+            summary = json.loads(Path(result["simulation"]["simulation_summary"]).read_text(encoding="utf-8"))
             self.assertIn("primary_reference_name", set(reference["parameter"]))
             auc_row = reference[reference["parameter"] == "reference_auc_ng_h_ml"].iloc[0]
             self.assertEqual(float(auc_row["value"]), 80)
+            self.assertEqual(summary["pktool_version"], "0.1.1")
+            self.assertEqual(summary["random_seed"], 20260512)
 
     def test_elimination_nonlinear_note_without_vmax_defaults_first_order(self):
         assessment = assess_elimination_kinetics(
@@ -131,8 +135,8 @@ class TestSimulation(unittest.TestCase):
             self.assertEqual(product["dosing_frequency"], "weekly_qw")
             self.assertEqual(product["dosing_interval_h"], 168.0)
             self.assertEqual(design["dosing_frequency"], "weekly_qw")
-            self.assertEqual(product["treatment_duration_h"], 672.0)
-            self.assertEqual(design["simulation"]["duration_h"], 840.0)
+            self.assertEqual(product["treatment_duration_h"], 840.0)
+            self.assertEqual(design["simulation"]["duration_h"], 1128.0)
 
     def test_multiple_minimal_input_requires_frequency_or_interval(self):
         with tempfile.TemporaryDirectory() as tmp:

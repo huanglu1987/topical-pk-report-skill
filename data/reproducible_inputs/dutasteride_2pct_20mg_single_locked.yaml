@@ -1,0 +1,128 @@
+project:
+  product_name: "Dutasteride 2% topical solution 20 mg single dose"
+  compound_name: "dutasteride"
+  indication: "androgenetic alopecia"
+  region: "China/US"
+
+compound:
+  compound_id: "DUTASTERIDE"
+  compound_name: "dutasteride"
+  molecular_weight: 528.5
+  xlogp: 5.4
+  half_life_h: 840
+  volume_l: 400
+  lloq_ng_ml: 0.025
+  safety_cmax_ng_ml: 40
+  safety_auc_ng_h_ml: 40
+  safety_cmax_source: "DailyMed/FDA Avodart label; chronic oral steady-state Css about 40 ng/mL"
+  safety_auc_source: "Exploratory single-dose local comparator; requires clinical pharmacology confirmation"
+  safety_threshold_interpretation: "Internal exploratory comparator only; not a regulatory safety limit."
+  elimination_model: "auto"
+  elimination_notes: "DailyMed label describes dose/concentration-dependent elimination and decreased clearance at higher concentrations; no Vmax/Km is available for this topical prediction."
+  value_source: "DailyMed/FDA label plus published oral BE; topical absorption calibrated qualitatively from 0.05% topical study."
+
+reference_pk:
+  source: ""
+  reference_dose_mg:
+  reference_auc_ng_h_ml:
+  reference_cmax_ng_ml:
+
+known_formulations:
+  - name: "Avodart/dutasteride 0.5 mg oral soft gelatin capsule, single dose"
+    route: "oral"
+    formulation: "soft gelatin capsule"
+    dose_mg: 0.5
+    single_or_multiple: "single"
+    cmax_ng_ml: 3.067
+    tmax_h: 1.5
+    tmax_range_h: [1, 3]
+    auc_ng_h_ml: 48.048
+    volume_l: 400
+    fraction_unbound: 0.005
+    metabolism_pathway: "CYP3A4/3A5 hepatic metabolism"
+    dose_proportionality: "nonlinear/concentration-dependent clearance noted in label"
+    linear_dose_range_mg: [0.5, 0.5]
+    population: "healthy"
+    species: "human"
+    source: "Fossler et al. 2015 BE study; reference 1 x 0.5 mg capsule"
+    primary_comparator: true
+    notes: "Single-dose comparator for single-dose topical prediction."
+  - name: "Published 0.05% topical solution Phase II PK benchmark"
+    route: "topical"
+    formulation: "solution"
+    dose_mg: 0.5
+    dose_description: "0.05% w/v, 1 mL once daily"
+    single_or_multiple: "single and multiple"
+    cmax_ng_ml: 0.16947
+    tmax_h: 5
+    tmax_range_h: [3, 8]
+    formulation_excipients: ["topical solution vehicle not fully public"]
+    vehicle: "topical solution; public vehicle details incomplete"
+    dose_proportionality: "unknown above 0.05%; high-concentration extrapolation required"
+    linear_dose_range_mg: [0.5, 0.5]
+    population: "patient"
+    species: "human"
+    source: "Panuganti et al. 2025 Cureus Phase II topical dutasteride study"
+    primary_comparator: false
+    notes: "External benchmark for fast absorption judgment."
+
+product:
+  product_name: "Dutasteride 2% w/v topical solution"
+  formulation: "solution"
+  concentration_percent_w_w: 2.0
+  dose_mg_per_application: 20
+  applications_per_day: 1
+  treated_area_cm2: 1.9
+  skin_condition: "AGA scalp target area"
+  max_use_condition: "20 mg single application over a 1.9 cm2 target scalp area"
+  occlusion: false
+  vehicle: "ethanol/propylene glycol-like topical solution assumption; verify against final formulation"
+  formulation_excipients: ["volatile solvent", "cosolvent/penetration enhancer assumption"]
+  absorption_fraction_range: [0.000005, 0.001]
+  ka_skin_h_range: [0.05, 0.8]
+  depot_half_life_h_range: [2, 72]
+  lag_time_h_range: [0, 8]
+  enable_fast_absorption: "auto"
+  fast_absorption_evidence:
+    observed_topical_tmax_h: 5
+    observed_topical_cmax_ng_ml: 0.16947
+    source: "0.05% topical solution published benchmark"
+  fast_absorption_fraction_range: [0.10, 0.45]
+  ka_fast_h_range: [0.35, 2.0]
+  fast_lag_time_h_range: [0, 2]
+  early_apparent_volume_l_range: [0.05, 2.5]
+  local_to_central_half_life_h_range: [8, 96]
+  variability_preset: "medium"
+  interindividual_cv:
+  bioavailability_cv:
+
+calibration_reference:
+  source_type: "human_topical"
+  source_citation: "Panuganti et al. 2025 Cureus Phase II topical dutasteride study"
+  concentration_percent: 0.05
+  dose_mg: 0.5
+  observed_tmax_h: 5
+  observed_tmax_h_range: [3, 8]
+  observed_cmax_ng_ml: 0.16947
+  observed_cmax_ng_ml_range: [0.05, 0.5]
+  vehicle_match_score: 0.8
+
+study_design:
+  dosing_scenario: "single"
+  purpose: "exploratory"
+  sampling_purposes: ["exploratory", "must_max_use", "be_bridging"]
+  n_simulations: 3000
+  random_seed: 20260515
+  time_step_h: 1
+  max_recommended_points: 18
+  candidate_sampling_hours: [0, 0.25, 0.5, 1, 2, 3, 4, 5, 6, 8, 12, 16, 24, 36, 48, 72, 96, 168, 336, 504, 672, 1008, 1344, 1680, 2016, 2520]
+
+evidence:
+  pubchem: false
+  fda: true
+  fda_ingredient: "dutasteride"
+  cde: true
+  cde_keyword: "药代动力学"
+
+report:
+  format: "md,xlsx"

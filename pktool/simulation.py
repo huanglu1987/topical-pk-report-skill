@@ -7,6 +7,7 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
+from . import __version__
 from .io_utils import get_range, load_compound_profile, load_reference_pk, read_yaml, to_float, write_json
 from .pk import effective_steady_state_times, interval_auc, resolve_systemic_pk, steady_state_frequency_matrix, trapezoid_auc
 
@@ -999,6 +1000,7 @@ def run_exposure_simulation(
 
     simulation_summary = {
         "generated_at": pd.Timestamp.utcnow().isoformat(),
+        "pktool_version": __version__,
         "compound": {
             "compound_id": str(compound.get("compound_id", "")),
             "compound_name": str(compound.get("compound_name", "")),
@@ -1022,6 +1024,7 @@ def run_exposure_simulation(
             "variability": variability,
         },
         "n_simulations": n,
+        "random_seed": seed,
         "duration_h": duration_h,
         "time_step_h": dt,
         "dosing_interval_h": tau_h,
