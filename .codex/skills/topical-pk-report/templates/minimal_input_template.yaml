@@ -8,6 +8,9 @@
 
 compound:
   compound_name: "efinaconazole"
+  # Optional but strongly recommended when available for molecule-specific planning.
+  # half_life_h:
+  # volume_l:
 
 product:
   formulation: "film-forming solution"
@@ -37,7 +40,9 @@ study_design:
   purpose: "exploratory"
   sampling_purposes: ["exploratory"]
   n_simulations: 1000
-  duration_h: 168
+  random_seed: 20260515
+  # Leave duration_h and dosing_duration_h blank/absent unless intentionally
+  # overriding the default single-dose or steady-state multiple-dose window.
 
 evidence:
   pubchem: true

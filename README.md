@@ -105,6 +105,12 @@ python -m pip install -e .
 data/minimal_input_template.yaml
 ```
 
+可直接在 GitHub 页面复制的最小输入模板见：
+
+```bash
+docs/MINIMAL_COPYABLE_INPUT.md
+```
+
 可直接在 GitHub 页面复制的度他雄胺 single / daily_qd / weekly_qw 输入模板见：
 
 ```bash

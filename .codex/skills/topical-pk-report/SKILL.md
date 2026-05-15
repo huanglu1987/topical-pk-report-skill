@@ -73,6 +73,83 @@ Use `templates/minimal_input_template.yaml` when the user only has these basics.
 dose_mg_per_application = concentration_percent_w_w x 10 x daily_amount_g / applications_per_day
 ```
 
+Copyable minimal single-dose YAML:
+
+```yaml
+compound:
+  compound_name: "dutasteride"
+  # Optional but strongly recommended when available:
+  # half_life_h: 840
+  # volume_l: 400
+
+product:
+  formulation: "solution"
+  concentration_percent_w_w: 2.0
+  dose_mg_per_application: 20
+  applications_per_day: 1
+
+study_design:
+  dosing_scenario: "single"
+  purpose: "exploratory"
+  sampling_purposes: ["exploratory"]
+  n_simulations: 1000
+  random_seed: 20260515
+
+evidence:
+  pubchem: false
+  fda: false
+  cde: false
+
+report:
+  format: "md,xlsx"
+```
+
+Copyable minimal multiple-dose YAML:
+
+```yaml
+compound:
+  compound_name: "dutasteride"
+  # Optional but strongly recommended when available:
+  # half_life_h: 840
+  # volume_l: 400
+
+product:
+  formulation: "solution"
+  concentration_percent_w_w: 2.0
+  dose_mg_per_application: 20
+  applications_per_day: 1
+
+study_design:
+  dosing_scenario: "multiple"
+  dosing_frequency: "daily_qd"
+  dosing_frequency_scenarios:
+    - name: "daily_qd"
+      label: "每日一次"
+      dosing_interval_h: 24
+    - name: "weekly_qw"
+      label: "每周一次"
+      dosing_interval_h: 168
+    - name: "weekly_biw"
+      label: "每周两次"
+      dosing_interval_h: 84
+  purpose: "exploratory"
+  sampling_purposes: ["exploratory"]
+  n_simulations: 1000
+  random_seed: 20260515
+
+evidence:
+  pubchem: false
+  fda: false
+  cde: false
+
+report:
+  format: "md,xlsx"
+```
+
+For multiple-dose minimal YAML, do not add `duration_h`, `dosing_duration_h`, or `product.treatment_duration_h` unless intentionally overriding the default steady-state window.
+
+Minimal YAML is not a reproducibility input. If no half-life or known formulation PK anchor is provided, the default steady-state window is calculated from model defaults and may coincidentally be 672 h for daily dosing; this is not a fixed 28-day rule. For dutasteride 2% 20 mg report reproduction, use the locked YAML files under `data/reproducible_inputs/`.
+
 Generic fallback assumptions are applied only when same-molecule PK anchors are absent: half-life 12 h, V 50 L, medium variability, exploratory purpose, and conservative topical absorption ranges. These fallback values are not historical data for the molecule and must not be cited as evidence. The report must clearly mark them as default/model-derived assumptions and treat the output as exploratory only.
 
 If the product is multiple-dose, do not proceed until the frequency is explicit. If the product is not once daily or single-application, also ask for `applications_per_day`, `product.dosing_interval_h`, and `treatment_duration_h` as applicable.
