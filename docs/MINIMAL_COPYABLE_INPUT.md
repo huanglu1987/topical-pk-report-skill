@@ -16,6 +16,10 @@ from model defaults and may coincidentally be 672 h for daily dosing. That is no
 a fixed 28-day rule. For dutasteride 2% 20 mg report reproduction, use the locked
 YAML files in `data/reproducible_inputs/`.
 
+The copyable templates default to `n_simulations: 3000` so P95/P5 tail estimates
+are less noisy. For quick smoke testing only, you may temporarily reduce it to
+`1000`.
+
 ## Single Dose
 
 ```yaml
@@ -35,7 +39,7 @@ study_design:
   dosing_scenario: "single"
   purpose: "exploratory"
   sampling_purposes: ["exploratory"]
-  n_simulations: 1000
+  n_simulations: 3000
   random_seed: 20260515
 
 evidence:
@@ -81,7 +85,7 @@ study_design:
       dosing_interval_h: 84
   purpose: "exploratory"
   sampling_purposes: ["exploratory"]
-  n_simulations: 1000
+  n_simulations: 3000
   random_seed: 20260515
 
 evidence:

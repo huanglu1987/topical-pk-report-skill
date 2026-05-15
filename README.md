@@ -111,6 +111,8 @@ data/minimal_input_template.yaml
 docs/MINIMAL_COPYABLE_INPUT.md
 ```
 
+最小模板默认 `n_simulations: 3000`，以降低 P95/P5 尾部估计的随机抖动；只做快速冒烟测试时可临时降到 `1000`。
+
 可直接在 GitHub 页面复制的度他雄胺 single / daily_qd / weekly_qw 输入模板见：
 
 ```bash

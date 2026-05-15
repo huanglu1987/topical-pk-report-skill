@@ -39,7 +39,7 @@ study_design:
       dosing_interval_h: 84
   purpose: "exploratory"
   sampling_purposes: ["exploratory"]
-  n_simulations: 1000
+  n_simulations: 3000
   random_seed: 20260515
   # Leave duration_h and dosing_duration_h blank/absent unless intentionally
   # overriding the default single-dose or steady-state multiple-dose window.

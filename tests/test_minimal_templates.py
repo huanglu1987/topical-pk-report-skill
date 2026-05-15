@@ -19,6 +19,7 @@ class TestMinimalTemplates(unittest.TestCase):
                 study = data["study_design"]
                 self.assertNotIn("duration_h", study)
                 self.assertNotIn("dosing_duration_h", study)
+                self.assertEqual(study["n_simulations"], 3000)
                 self.assertEqual(study["random_seed"], 20260515)
 
     def test_minimal_copyable_doc_yaml_blocks_parse(self):
@@ -29,6 +30,8 @@ class TestMinimalTemplates(unittest.TestCase):
         self.assertEqual(parsed[0]["study_design"]["dosing_scenario"], "single")
         self.assertEqual(parsed[1]["study_design"]["dosing_scenario"], "multiple")
         self.assertEqual(parsed[1]["study_design"]["dosing_frequency"], "daily_qd")
+        self.assertEqual(parsed[0]["study_design"]["n_simulations"], 3000)
+        self.assertEqual(parsed[1]["study_design"]["n_simulations"], 3000)
         self.assertNotIn("duration_h", parsed[1]["study_design"])
         self.assertNotIn("dosing_duration_h", parsed[1]["study_design"])
         self.assertNotIn("treatment_duration_h", parsed[1]["product"])

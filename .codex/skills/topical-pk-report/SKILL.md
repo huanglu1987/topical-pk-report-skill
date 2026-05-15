@@ -92,7 +92,7 @@ study_design:
   dosing_scenario: "single"
   purpose: "exploratory"
   sampling_purposes: ["exploratory"]
-  n_simulations: 1000
+  n_simulations: 3000
   random_seed: 20260515
 
 evidence:
@@ -134,7 +134,7 @@ study_design:
       dosing_interval_h: 84
   purpose: "exploratory"
   sampling_purposes: ["exploratory"]
-  n_simulations: 1000
+  n_simulations: 3000
   random_seed: 20260515
 
 evidence:
@@ -149,6 +149,8 @@ report:
 For multiple-dose minimal YAML, do not add `duration_h`, `dosing_duration_h`, or `product.treatment_duration_h` unless intentionally overriding the default steady-state window.
 
 Minimal YAML is not a reproducibility input. If no half-life or known formulation PK anchor is provided, the default steady-state window is calculated from model defaults and may coincidentally be 672 h for daily dosing; this is not a fixed 28-day rule. For dutasteride 2% 20 mg report reproduction, use the locked YAML files under `data/reproducible_inputs/`.
+
+The copyable minimal templates default to `n_simulations: 3000` so P95/P5 tail estimates are less noisy. For quick smoke testing only, temporarily reduce it to `1000`.
 
 Generic fallback assumptions are applied only when same-molecule PK anchors are absent: half-life 12 h, V 50 L, medium variability, exploratory purpose, and conservative topical absorption ranges. These fallback values are not historical data for the molecule and must not be cited as evidence. The report must clearly mark them as default/model-derived assumptions and treat the output as exploratory only.
 
