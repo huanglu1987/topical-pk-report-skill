@@ -120,9 +120,6 @@ def _metric_table(summary: dict[str, Any]) -> list[str]:
             "cavg_ng_ml",
             "ctrough_ng_ml",
             "rac",
-            "time_to_90pct_steady_state_h",
-            "time_to_95pct_steady_state_h",
-            "time_to_99pct_steady_state_h",
             "auc_ratio_reference",
             "cmax_ratio_reference",
         ]
@@ -174,6 +171,30 @@ def _frequency_ss_lines(summary: dict[str, Any]) -> list[str]:
         )
     lines.append("")
     lines.append("- 注：100% 稳态为理论渐近值，表中“接近100%”按 99% 稳态计算。")
+    return lines
+
+
+def _exposure_section_lines(summary: dict[str, Any]) -> list[str]:
+    lines = [
+        "## 3. 系统暴露预测",
+        "",
+        "### 3.1 暴露指标预测",
+        "",
+        *_metric_table(summary),
+    ]
+    if summary.get("is_multiple_dose"):
+        lines.extend(
+            [
+                "",
+                "### 3.2 稳态时间口径",
+                "",
+                *_steady_state_lines(summary),
+                "",
+                "### 3.3 不同给药频率下的稳态时间",
+                "",
+                *_frequency_ss_lines(summary),
+            ]
+        )
     return lines
 
 
@@ -398,17 +419,7 @@ def generate_report(
             "",
             *_known_formulations_lines(known_formulations),
             "",
-            "## 3. 系统暴露预测",
-            "",
-            *_metric_table(summary),
-            "",
-            "## 3.5 稳态时间口径",
-            "",
-            *_steady_state_lines(summary),
-            "",
-            "## 3.6 不同给药频率下的稳态时间",
-            "",
-            *_frequency_ss_lines(summary),
+            *_exposure_section_lines(summary),
             "",
             "## 4. 早期快速吸收判定",
             "",

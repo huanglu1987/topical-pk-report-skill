@@ -52,6 +52,29 @@ class TestV11Revision(unittest.TestCase):
             self.assertIn("auc_0_t_studyend_ng_h_ml", metrics)
             self.assertNotIn("auc0_inf_ng_h_ml", metrics)
 
+    def test_report_steady_state_sections_only_for_multiple_dose(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            result = _run_input(_load_input("dutasteride_1pct_solution_single_input.yaml"), tmp)
+            report = Path(result["reports"][0]).read_text(encoding="utf-8")
+            self.assertIn("## 3. 系统暴露预测", report)
+            self.assertIn("### 3.1 暴露指标预测", report)
+            self.assertNotIn("稳态时间口径", report)
+            self.assertNotIn("不同给药频率下的稳态时间", report)
+            self.assertNotIn("## 3.5", report)
+            self.assertNotIn("## 3.6", report)
+
+        with tempfile.TemporaryDirectory() as tmp:
+            result = _run_input(_load_input("dutasteride_1pct_solution_multiple_input.yaml"), tmp)
+            report = Path(result["reports"][0]).read_text(encoding="utf-8")
+            self.assertIn("## 3. 系统暴露预测", report)
+            self.assertIn("### 3.1 暴露指标预测", report)
+            self.assertIn("### 3.2 稳态时间口径", report)
+            self.assertIn("### 3.3 不同给药频率下的稳态时间", report)
+            exposure_table = report.split("### 3.2 稳态时间口径", 1)[0]
+            self.assertNotIn("达到90%稳态时间", exposure_table)
+            self.assertNotIn("## 3.5", report)
+            self.assertNotIn("## 3.6", report)
+
     def test_fast_absorption_v2_threshold_and_gate(self):
         compound = {"molecular_weight": 528.5, "xlogp": 4.5, "lloq_ng_ml": 0.025}
         product = {
