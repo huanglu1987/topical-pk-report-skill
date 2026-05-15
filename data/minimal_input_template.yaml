@@ -5,6 +5,11 @@
 # concentration_percent_w_w x 10 x daily_amount_g / applications_per_day.
 # Without verified same-molecule PK anchors, the tool may use generic fallback
 # assumptions; these are not molecule-specific historical data or evidence.
+# For a decision-comparable main analysis, copy this to a project-specific file
+# and lock the full analysis package: primary comparator, absorption/depot/lag
+# ranges, fast-absorption rule, simulation duration, n_simulations, random_seed,
+# evidence fetch state, and pktool version. Put alternative assumptions in
+# separate named sensitivity YAML files instead of mixing them into the main run.
 
 compound:
   compound_name: "efinaconazole"

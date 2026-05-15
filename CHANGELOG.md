@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added general new-project reproducibility rules to the Skill and README: lock the main-analysis comparator, absorption/depot/lag assumptions, fast-absorption rule, simulation duration, random seed, simulation count, evidence state, and tool version before comparing reports.
+- Clarified that sensitivity analyses must be separate named scenarios and should not be merged into the main-analysis conclusion.
+- Added template comments so teammate onboarding inputs distinguish minimal input from a decision-comparable locked analysis package.
+
 ## v0.1.1 - 2026-05-15
 
 - Changed the default multiple-dose one-click duration logic from a 28-day run to a near-100% steady-state run when only dosing frequency is provided.

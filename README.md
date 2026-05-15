@@ -119,6 +119,20 @@ docs/MINIMAL_COPYABLE_INPUT.md
 docs/COPYABLE_INPUT_TEMPLATES.md
 ```
 
+### 新项目主分析固定口径
+
+对任何新项目，不能只说“用了同一个 Skill”就认为结果可比。可复现的主分析需要锁定完整分析包：
+
+- 项目事实：分子、剂型、浓度、活性剂量、给药频率、给药部位/面积、单次或多次给药、是否最大使用条件、研究目的。
+- 主比较锚点：主分析只能有一个主要 PK comparator；其他公开 PK 数据作为背景证据或单独敏感性分析。
+- 锚点选择规则：优先同分子、同给药途径、同部位、同单次/多次口径；单次目标优先单次 PK，多次或 max-use 目标优先重复给药/稳态/max-use PK。
+- 模型假设：固定 `absorption_fraction_range`、`ka_skin_h_range`、`depot_half_life_h_range`、`lag_time_h_range`、`enable_fast_absorption`、变异度、模拟时长、`n_simulations` 和 `random_seed`。
+- 工具状态：记录 `pktool` 版本、是否联网抓取证据、人工确认的证据表，以及运行目录里的输入快照。
+
+快速吸收默认使用 `auto`。只有存在明确早期人体外用 Tmax、IVPT/Jss、处方促渗证据，或用户明确要求保守敏感性分析时，才手动开启 `enable_fast_absorption: true`。如果自动判定为证据不足但人工开启，应把该运行命名为敏感性分析，不要放进主分析结论。
+
+敏感性分析可以改变关键假设，但应单独命名、单独运行，并尽量一次只改变一个主要假设，例如高吸收、慢 depot、开启快速吸收、替代锚点、更长末端随访或高变异度。
+
 如果目标是复现既有度他雄胺 2% 20 mg 报告，不要让 Codex 根据自然语言重新生成 YAML；直接运行：
 
 ```bash

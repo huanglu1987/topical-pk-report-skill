@@ -30,6 +30,11 @@ reference_pk:
   reference_auc_ng_h_ml:
   reference_cmax_ng_ml:
 
+# Main-analysis locking rule:
+# - Pick one primary comparator according to molecule/route/site/formulation and
+#   single-vs-multiple dosing match.
+# - Keep alternative anchors as background evidence or separate sensitivity YAML.
+# - Do not average conflicting public PK anchors.
 known_formulations:
   - name: ""
     route: "oral"
@@ -104,6 +109,9 @@ product:
   occlusion: false
   vehicle: ""
   formulation_excipients: []
+  # Main-analysis model assumptions. Fix these explicitly when known; otherwise
+  # document that model defaults are being used. For sensitivity runs, copy this
+  # YAML and change one major assumption at a time.
   absorption_fraction_range:
   ka_skin_h_range:
   depot_half_life_h_range:

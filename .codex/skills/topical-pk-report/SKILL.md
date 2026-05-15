@@ -156,6 +156,27 @@ Generic fallback assumptions are applied only when same-molecule PK anchors are 
 
 If the product is multiple-dose, do not proceed until the frequency is explicit. If the product is not once daily or single-application, also ask for `applications_per_day`, `product.dosing_interval_h`, and `treatment_duration_h` as applicable.
 
+## New Project Reproducibility Rule
+
+For a new project, the same skill plus the same minimal natural-language input is not enough to guarantee the same result. A reproducible main analysis requires a locked analysis package. Before running or comparing reports, explicitly fix the items below in the YAML or generated input snapshot:
+
+- project facts: compound, formulation, concentration, active dose, application frequency, treated site/area, single vs multiple dosing, max-use intent, and study purpose.
+- primary comparator rule: one declared main PK anchor for the main analysis, with other public PK records kept as background evidence unless they are named sensitivity scenarios.
+- model assumptions: `absorption_fraction_range`, `ka_skin_h_range`, `depot_half_life_h_range`, `lag_time_h_range`, `enable_fast_absorption`, fast-absorption ranges if used, `variability_preset`, `n_simulations`, `random_seed`, simulation duration/time-step overrides, and safety comparator sources.
+- tool and evidence state: `pktool` version, fetch/no-fetch choice, manually confirmed public evidence, and any run-specific input files under the generated `runs/<timestamp>_<compound>/inputs/` directory.
+
+Anchor selection must follow this hierarchy unless the user intentionally requests a sensitivity scenario:
+
+1. same molecule with the closest route, body site, formulation/use condition, and single/multiple dosing scenario.
+2. for a single-dose target, prefer single-dose human PK anchors; use repeated-dose, steady-state, or max-use anchors as background or conservative sensitivity only.
+3. for a multiple-dose, steady-state, or max-use target, prefer repeated-dose, steady-state, or max-use anchors that match the intended use condition.
+4. skin-target products should prefer skin-application data over nail, mucosal, oral, or injectable data; less-matched routes are disposition context or background evidence, not the default main comparator.
+5. if no well-matched anchor exists, keep the run exploratory, document the mismatch, and do not silently promote a weak anchor to decision-grade evidence.
+
+Fast absorption is `auto` by default. Set `enable_fast_absorption: true` only when there is explicit support such as observed early human topical Tmax, IVPT/Jss evidence, formulation/vehicle evidence for rapid systemic entry, or a user-approved conservative sensitivity run. If the automatic assessment is insufficient and the user manually turns it on, label the run as a sensitivity scenario, not the main analysis.
+
+Sensitivity analyses are allowed and encouraged, but they must be separate named scenarios. Change one major assumption at a time where possible, such as high absorption, slow depot, fast absorption on, alternative comparator, longer terminal follow-up, or higher variability. Do not merge sensitivity assumptions into the main-analysis conclusion.
+
 Default duration logic:
 
 - `single`: defaults to one application over 24 h. The simulation window is at least 168 h and is extended to at least 3 x `t_half_eff` for long half-life or slow depot products, so terminal elimination has at least two late follow-up points.
@@ -202,6 +223,8 @@ Always try to capture same-molecule prior PK before simulation. Put these record
 
 Use non-topical systemic formulations, especially oral or injection, as the preferred systemic disposition anchor. Use existing topical data as local-delivery precedent or calibration evidence, not as a replacement for confirming the target product.
 
+For the main analysis, mark exactly one record as `primary_comparator: true` when a usable comparator exists. If there are competing plausible anchors, choose one main comparator according to the hierarchy above and put the alternatives into named sensitivity YAML files. Do not average conflicting public PK anchors, and do not mix single-dose and repeated-dose anchors in the same main comparator unless the user explicitly labels the run as exploratory sensitivity.
+
 ## Workflow
 
 1. Create or update a YAML input file using `templates/minimal_input_template.yaml` for onboarding, or `templates/basic_input_template.yaml` for a fuller PK run.
@@ -221,7 +244,8 @@ Use `--no-fetch` when public evidence was already manually captured or when the 
 
 4. Review the generated run directory under `runs/`.
 5. Read `simulation_summary.json`, `sampling_recommendation.csv`, `parameter_provenance.csv`, and `dose_extrapolation_sensitivity.csv` before summarizing.
-6. Report the Markdown and Excel paths to the user and state the decision-gate status.
+6. For comparisons between two reports, read the run-specific input snapshot and summarize differences in primary comparator, absorption ranges, fast absorption status, depot/lag ranges, duration, `n_simulations`, `random_seed`, and `pktool` version before comparing exposure outputs.
+7. Report the Markdown and Excel paths to the user and state the decision-gate status.
 
 ## Output
 

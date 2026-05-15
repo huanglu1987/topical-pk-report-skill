@@ -20,6 +20,29 @@ The copyable templates default to `n_simulations: 3000` so P95/P5 tail estimates
 are less noisy. For quick smoke testing only, you may temporarily reduce it to
 `1000`.
 
+## Reproducible Main Analysis
+
+For a new project, minimal YAML is only an onboarding input. Before treating a
+run as the main analysis, lock the full analysis package:
+
+- target product facts: dose, frequency, site/area, single or multiple dosing,
+  max-use intent, and study purpose.
+- primary comparator: one main PK anchor selected by the closest match to
+  molecule, route, body site, formulation/use condition, and dosing scenario.
+- model assumptions: absorption fraction range, skin absorption rate, depot
+  half-life range, lag range, fast absorption setting, variability preset,
+  simulation duration, `n_simulations`, and `random_seed`.
+- evidence state: manually confirmed public PK evidence, fetch/no-fetch choice,
+  `pktool` version, and run-specific input snapshot.
+
+Use single-dose anchors for single-dose targets when available. Use repeated-dose
+or max-use anchors for repeated-dose, steady-state, or max-use targets. Less
+matched anchors should be background evidence or named sensitivity scenarios,
+not silent replacements for the main comparator.
+
+Fast absorption should stay on `auto` unless there is explicit evidence or the
+run is intentionally named as a conservative sensitivity analysis.
+
 ## Single Dose
 
 ```yaml
